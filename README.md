@@ -19,8 +19,7 @@ The structure is Swiss Modernism (8px base unit, one accent hue, rules instead o
 typography is editorial (Source Serif 4 for prose, JetBrains Mono for metadata). Every design value
 lives in `src/styles/global.css` as a token — components never hard-code them.
 
-There's a longer write-up in
-[the first post](https://jaypetez.github.io/writing/rebuilding-this-site/).
+The rules are in `tests/design/tokens.test.ts` if you want the exact list.
 
 ## Local development
 
@@ -102,5 +101,12 @@ Two licenses, because a site is both code and writing:
 
 ## Contributing
 
-It's a personal site, so features are opinionated — but bug reports, accessibility problems, and
-typo fixes are genuinely welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+**This repository is published to be read and reused, not contributed to.** Issues, pull requests,
+and comments are restricted to collaborators, so an outside PR can't be opened — please fork instead
+if you want to build on any of it. The MIT license means you don't need my permission.
+
+The one channel that is open to everyone is
+[private security reporting](https://github.com/jaypetez/jaypetez.github.io/security/advisories/new).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the design constraints CI enforces, which are the useful
+part if you're reusing the code.

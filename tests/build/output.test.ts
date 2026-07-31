@@ -11,14 +11,29 @@ import axe from 'axe-core';
  */
 
 const DIST = join(process.cwd(), 'dist');
+const BLOG_DIR = join(process.cwd(), 'src/content/blog');
 
-const PAGES = [
+/**
+ * Post slugs come from the content directory, never a hard-coded list, so
+ * adding, renaming, or removing a post needs no edit here. Drafts are excluded
+ * because the build excludes them.
+ */
+const POST_SLUGS: string[] = readdirSync(BLOG_DIR)
+  .filter((file) => /\.mdx?$/.test(file))
+  .filter((file) => !/^draft:\s*true$/m.test(readFileSync(join(BLOG_DIR, file), 'utf8')))
+  .map((file) => file.replace(/\.mdx?$/, ''));
+
+const STATIC_PAGES: readonly (readonly [string, string])[] = [
   ['home', 'index.html'],
   ['writing index', 'writing/index.html'],
-  ['post', 'writing/rebuilding-this-site/index.html'],
   ['about', 'about/index.html'],
   ['404', '404.html'],
-] as const;
+];
+
+const PAGES: readonly (readonly [string, string])[] = [
+  ...STATIC_PAGES,
+  ...POST_SLUGS.map((slug) => [`post: ${slug}`, `writing/${slug}/index.html`] as const),
+];
 
 beforeAll(() => {
   if (!existsSync(DIST)) {
@@ -62,15 +77,24 @@ describe('build output', () => {
     expect(existsSync(join(DIST, 'sitemap-index.xml'))).toBe(true);
   });
 
-  it('lists the post in the RSS feed with an absolute link', () => {
+  it('found posts to assert against', () => {
+    // Guards the derived-slug approach: an empty content dir would silently
+    // turn several assertions below into no-ops.
+    expect(POST_SLUGS.length).toBeGreaterThan(0);
+  });
+
+  it('lists every published post in the RSS feed with an absolute link', () => {
     const rss = read('rss.xml');
     expect(rss).toContain('<title>Jayson Petersen</title>');
-    expect(rss).toContain('https://jaypetez.github.io/writing/rebuilding-this-site/');
+    for (const slug of POST_SLUGS) {
+      expect(rss).toContain(`https://jaypetez.github.io/writing/${slug}/`);
+    }
   });
 
   it('lists every page in the sitemap', () => {
     const sitemap = read('sitemap-0.xml');
-    for (const path of ['', 'about/', 'writing/', 'writing/rebuilding-this-site/']) {
+    const paths = ['', 'about/', 'writing/', ...POST_SLUGS.map((slug) => `writing/${slug}/`)];
+    for (const path of paths) {
       expect(sitemap).toContain(`https://jaypetez.github.io/${path}`);
     }
   });

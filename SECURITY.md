@@ -11,8 +11,9 @@ user input handling, so the realistic attack surface is small. The things that w
 - Cross-site scripting through injected markup in content rendering.
 - Leaked secrets or overly broad workflow permissions.
 
-Reports about the *content* of the site (opinions, factual errors, typos) aren't security issues —
-please open a normal issue for those.
+Reports about the *content* of the site (opinions, factual errors, typos) aren't security issues.
+Public issues are restricted to collaborators on this repo, so please don't route those through the
+advisory form either — it's for vulnerabilities.
 
 ## Supported versions
 

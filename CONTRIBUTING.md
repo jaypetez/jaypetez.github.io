@@ -1,17 +1,24 @@
 # Contributing
 
-This is a personal site, so the content and the design direction are mine. That said, some
-contributions are genuinely useful and I'd be glad to have them:
+**Short version: this repo doesn't take outside contributions, and GitHub is configured to enforce
+that.** Issues, pull requests, and comments are limited to collaborators, so an outside PR can't be
+opened at all. That's deliberate — it's a personal site, and I'd rather be honest about it than leave
+a "contributions welcome" note that quietly rejects people.
 
-- **Accessibility problems.** If something is unreachable by keyboard, unreadable with a screen
-  reader, or fails contrast at any viewport, that's a bug and I want to know.
-- **Broken things.** Dead links, layout breaking at a width I didn't test, rendering bugs in a
-  browser I don't use.
-- **Typos and factual errors** in posts.
-- **Tooling and test improvements.**
+What you *can* do:
 
-What I'll usually decline: redesigns, new frameworks or client-side JavaScript, and content
-suggestions about what I should write.
+- **Fork it and take whatever's useful.** The code is MIT (the writing is CC BY 4.0), so you don't
+  need to ask. The design-token setup and the tests that enforce it are the parts most worth stealing.
+- **Report a security issue.** This one channel is open to everyone, via
+  [a private advisory](https://github.com/jaypetez/jaypetez.github.io/security/advisories/new).
+  See [SECURITY.md](SECURITY.md).
+
+If you've found a genuine bug — a broken link, something unreachable by keyboard, a contrast failure —
+I do want to know, and the security advisory form is the reachable route until the interaction limit
+lapses.
+
+The rest of this file documents the constraints CI enforces. It's here for anyone reusing the code,
+and for me in six months.
 
 ## Ground rules the tests enforce
 
@@ -41,7 +48,7 @@ npm install
 npm run dev
 ```
 
-## Before opening a pull request
+## Before committing
 
 ```bash
 npm run format
@@ -65,10 +72,13 @@ build: bump astro to 7.2
 
 ## Pull requests
 
+Only I and Dependabot can open these, but the bar is the same for both:
+
 - One logical change per PR.
 - Fill in the checklist in the template.
-- For anything visual, include screenshots in **both** light and dark mode, plus a narrow viewport.
-- CI must be green. The deploy job won't run otherwise, and neither will a merge.
+- For anything visual, check **both** light and dark mode, plus a narrow viewport.
+- CI must be green. `main` requires the `Test (22.x)`, `Test (24.x)`, and `Build` checks, and the
+  deploy job cannot run unless all three pass.
 
 ## Reporting security issues
 

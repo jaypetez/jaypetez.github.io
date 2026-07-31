@@ -36,7 +36,9 @@ describe('Nav', () => {
   });
 
   it('marks the current page on the section it belongs to', async () => {
-    const html = await renderAt('/writing/rebuilding-this-site/');
+    // Any post path works; this asserts section matching, not that a specific
+    // post exists.
+    const html = await renderAt('/writing/any-post/');
     // A post lives under Writing, so Writing is the current section.
     expect(html).toMatch(/href="\/writing\/"[^>]*aria-current="page"/);
   });

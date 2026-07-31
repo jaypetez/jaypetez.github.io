@@ -50,7 +50,7 @@ describe('readingTime', () => {
 
 describe('slugify', () => {
   it('lowercases and joins words with single dashes', () => {
-    expect(slugify('Rebuilding This Site')).toBe('rebuilding-this-site');
+    expect(slugify('Agentic Graph Engineering')).toBe('agentic-graph-engineering');
   });
 
   it('folds accents to ASCII', () => {
