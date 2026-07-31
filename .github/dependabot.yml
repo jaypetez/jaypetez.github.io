@@ -23,6 +23,14 @@ updates:
       prefix: 'build'
     labels:
       - dependencies
+    ignore:
+      # @astrojs/check pins `typescript@^5 || ^6` through @astrojs/language-server,
+      # so a TypeScript 7 bump is an unresolvable peer conflict rather than a
+      # code change. Minor and patch updates still come through; drop this entry
+      # once @astrojs/check widens its peer range.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
     groups:
       # Astro and its official integrations move together; a split update
       # usually just fails peer resolution.
