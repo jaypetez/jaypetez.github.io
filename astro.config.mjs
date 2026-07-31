@@ -26,8 +26,22 @@ export default defineConfig({
       provider: fontProviders.google(),
       name: 'Source Serif 4',
       cssVariable: '--font-serif',
-      weights: [300, 400, 600],
-      styles: ['normal', 'italic'],
+      // Only the weights the stylesheet actually uses: 400 body, 600 headings.
+      weights: [400, 600],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'Times New Roman', 'serif'],
+    },
+    {
+      // Italic is a separate entry so it can be left out of the preload set. It
+      // only appears in post blockquotes and emphasis, and preloading it put
+      // ~50 KB on the critical path of every page, including the four that
+      // contain no italic text at all.
+      provider: fontProviders.google(),
+      name: 'Source Serif 4',
+      cssVariable: '--font-serif-italic',
+      weights: [400],
+      styles: ['italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },

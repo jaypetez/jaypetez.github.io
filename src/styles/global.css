@@ -177,6 +177,16 @@ li {
   text-wrap: pretty;
 }
 
+/* Real italics come from a separate, lazily loaded face rather than a synthetic
+   slant. See the font config for why it is not preloaded. */
+em,
+i,
+blockquote,
+cite {
+  font-family: var(--font-serif-italic), Georgia, 'Times New Roman', serif;
+  font-style: italic;
+}
+
 a {
   color: var(--color-accent);
   text-decoration-thickness: 1px;

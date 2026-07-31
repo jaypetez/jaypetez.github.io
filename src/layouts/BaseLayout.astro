@@ -38,9 +38,15 @@ const fullTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
     <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <!-- Self-hosted and preloaded; generated fallback metrics prevent layout shift. -->
+    <!--
+      Self-hosted; generated fallback metrics prevent layout shift. Only the two
+      faces used above the fold are preloaded. The italic serif is declared but
+      deliberately not preloaded — it is needed on post pages only, and loading
+      it eagerly cost ~50 KB of critical path everywhere else.
+    -->
     <Font cssVariable="--font-serif" preload />
     <Font cssVariable="--font-mono" preload />
+    <Font cssVariable="--font-serif-italic" />
 
     <!--
       Applies the stored theme before first paint so a dark-mode visitor never

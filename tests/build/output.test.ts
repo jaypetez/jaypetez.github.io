@@ -86,6 +86,27 @@ describe('build output', () => {
     }
   });
 
+  it.each(PAGES)('%s preloads only the two above-the-fold faces', (_label, file) => {
+    const preloads = [...read(file).matchAll(/<link rel="preload"[^>]*href="([^"]+\.woff2)"/g)];
+    // Upright serif for body copy and mono for metadata. The italic serif is
+    // declared but not preloaded — it would add ~50 KB of critical path to every
+    // page for text that only appears inside posts.
+    expect(preloads).toHaveLength(2);
+  });
+
+  it('keeps the critical-path payload small', () => {
+    const html = read('index.html');
+    const preloadedFontBytes = [...html.matchAll(/<link rel="preload"[^>]*href="([^"]+\.woff2)"/g)]
+      .map((m) => readFileSync(join(DIST, m[1]!)).byteLength)
+      .reduce((a, b) => a + b, 0);
+    const css = [...html.matchAll(/<link rel="stylesheet"[^>]*href="(\/_astro\/[^"]+)"/g)]
+      .map((m) => readFileSync(join(DIST, m[1]!)).byteLength)
+      .reduce((a, b) => a + b, 0);
+
+    // Two woff2 faces plus the stylesheet. Fails if a third font gets preloaded.
+    expect(preloadedFontBytes + css).toBeLessThan(100_000);
+  });
+
   it('ships a trivial amount of JavaScript', () => {
     const html = read('index.html');
 
