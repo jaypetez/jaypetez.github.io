@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" description="That page does not exist on jaypetez.github.io.">
+  <div class="wrap">
+    <p class="code mono">404</p>
+    <h1>That page doesn&rsquo;t exist</h1>
+    <p class="lede">
+      The link may be out of date, or I may have moved something. Both are usually my fault.
+    </p>
+    <ul class="mono links">
+      <li><a href="/">Work</a></li>
+      <li><a href="/writing/">Writing</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .wrap {
+    max-width: var(--measure);
+    padding-block: var(--space-12);
+  }
+
+  .code {
+    color: var(--color-accent);
+  }
+
+  h1 {
+    margin-block: var(--space-2);
+  }
+
+  .lede {
+    color: var(--color-muted);
+  }
+
+  .links {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding: 0;
+    list-style: none;
+  }
+</style>

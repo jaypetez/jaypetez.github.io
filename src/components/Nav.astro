@@ -1,0 +1,100 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+
+/**
+ * Site navigation: three flat destinations, no dropdowns. The current route is
+ * marked with aria-current so it is announced, and underlined so it is not
+ * signalled by colour alone.
+ */
+const links = [
+  { href: '/', label: 'Work' },
+  { href: '/writing/', label: 'Writing' },
+  { href: '/about/', label: 'About' },
+] as const;
+
+const path = Astro.url.pathname;
+
+function isCurrent(href: string): boolean {
+  if (href === '/') return path === '/';
+  return path === href || path.startsWith(href);
+}
+---
+
+<header class="site-header">
+  <div class="page bar">
+    <a class="wordmark mono" href="/">JP</a>
+
+    <nav aria-label="Main">
+      <ul>
+        {
+          links.map((link) => (
+            <li>
+              <a
+                class="mono"
+                href={link.href}
+                aria-current={isCurrent(link.href) ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .bar {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    min-height: var(--space-6);
+  }
+
+  .wordmark {
+    color: var(--color-fg);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  nav {
+    margin-inline-start: auto;
+  }
+
+  ul {
+    display: flex;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    display: inline-block;
+    /* 44px tall tap target on touch, without changing the visual rhythm. */
+    padding-block: var(--space-2);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration) var(--ease);
+  }
+
+  nav a:hover {
+    color: var(--color-fg);
+  }
+
+  /* Current page is both coloured and underlined — never colour alone. */
+  nav a[aria-current='page'] {
+    color: var(--color-fg);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+</style>

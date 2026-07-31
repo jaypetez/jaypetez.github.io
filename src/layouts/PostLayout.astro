@@ -1,0 +1,133 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import PostMeta from '../components/PostMeta.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date | undefined;
+  minutes: number;
+  tags?: readonly string[];
+}
+
+const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} type="article">
+  <article class="post">
+    <header>
+      <h1>{title}</h1>
+      <PostMeta pubDate={pubDate} updatedDate={updatedDate} minutes={minutes} tags={tags} />
+    </header>
+
+    <div class="prose body">
+      <slot />
+    </div>
+
+    <footer>
+      <a class="mono" href="/writing/">&larr; All writing</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    padding-block: var(--space-6);
+  }
+
+  header {
+    max-width: var(--measure);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  header h1 {
+    margin-bottom: var(--space-2);
+  }
+
+  .body {
+    margin-top: var(--space-4);
+  }
+
+  /* Prose styling is global rather than scoped because the markdown renderer
+     emits these elements outside this component's scope. */
+  .body :global(h2) {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
+  }
+
+  .body :global(h3) {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-1);
+  }
+
+  .body :global(p),
+  .body :global(ul),
+  .body :global(ol),
+  .body :global(pre),
+  .body :global(blockquote),
+  .body :global(table) {
+    margin-bottom: var(--space-3);
+  }
+
+  .body :global(ul),
+  .body :global(ol) {
+    padding-inline-start: var(--space-3);
+  }
+
+  .body :global(li) {
+    margin-bottom: var(--space-1);
+  }
+
+  .body :global(blockquote) {
+    padding-inline-start: var(--space-2);
+    border-inline-start: 2px solid var(--color-accent);
+    color: var(--color-muted);
+    font-style: italic;
+  }
+
+  .body :global(pre) {
+    padding: var(--space-2);
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-none);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .body :global(hr) {
+    margin-block: var(--space-6);
+    border: 0;
+    border-top: 1px solid var(--color-rule);
+  }
+
+  /* Wide tables scroll inside their own container; the page never does. */
+  .body :global(table) {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .body :global(th),
+  .body :global(td) {
+    padding: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+    text-align: start;
+  }
+
+  footer {
+    margin-top: var(--space-8);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  footer a {
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<article class="row">
+  <h3>
+    <a href={project.repo} rel="noopener">{project.name}</a>
+  </h3>
+
+  <p class="description">{project.description}</p>
+
+  <p class="meta mono">
+    <span>{project.language}</span>
+    <span aria-hidden="true">&middot;</span>
+    <span>{project.license}</span>
+    {
+      project.stars !== undefined && (
+        <>
+          <span aria-hidden="true">&middot;</span>
+          {/* The glyph is decorative; the number needs the word for screen readers. */}
+          <span>
+            <span aria-hidden="true">&#9733;</span>
+            <span class="visually-hidden">GitHub stars:</span>
+            {project.stars}
+          </span>
+        </>
+      )
+    }
+    {
+      project.docs && (
+        <a class="docs" href={project.docs}>
+          Docs
+        </a>
+      )
+    }
+  </p>
+</article>
+
+<style>
+  /* A rule between rows, not a box around each — the card grid is the single
+     most recognisable AI-generated layout, and this is the deliberate opposite. */
+  .row {
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .row:first-of-type {
+    border-top: 1px solid var(--color-border);
+  }
+
+  h3 {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: var(--text-base);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  h3 a {
+    color: var(--color-fg);
+    text-decoration-color: var(--color-rule);
+  }
+
+  h3 a:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentcolor;
+  }
+
+  .description {
+    max-width: var(--measure);
+    margin-top: var(--space-1);
+    color: var(--color-muted);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: baseline;
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+  }
+
+  .docs {
+    margin-inline-start: auto;
+  }
+</style>

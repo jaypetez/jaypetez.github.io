@@ -1,0 +1,70 @@
+---
+import { Font } from 'astro:assets';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Set on article pages so the page reports as an article to crawlers. */
+  type?: 'website' | 'article';
+}
+
+const { title, description, type = 'website' } = Astro.props;
+
+const SITE_NAME = 'Jayson Petersen';
+// Astro.site comes from `site` in astro.config.mjs, so canonicals are absolute.
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const fullTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Self-hosted and preloaded; generated fallback metrics prevent layout shift. -->
+    <Font cssVariable="--font-serif" preload />
+    <Font cssVariable="--font-mono" preload />
+
+    <!--
+      Applies the stored theme before first paint so a dark-mode visitor never
+      sees a white flash. Inline and synchronous by necessity — deferring it is
+      what causes the flash.
+    -->
+    <script is:inline>
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light' || stored === 'dark') {
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- First focusable element on the page, so keyboard users can bypass the nav. -->
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <Nav />
+
+    <main id="main" class="page">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

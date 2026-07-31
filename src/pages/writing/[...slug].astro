@@ -1,0 +1,41 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { publishedPosts } from '../../lib/posts';
+import { readingTime } from '../../lib/format';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = publishedPosts<CollectionEntry<'blog'>>(
+    await getCollection('blog'),
+    import.meta.env.DEV,
+  );
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+};
+
+// getStaticPaths cannot infer prop types back into the component, so they are
+// declared explicitly here.
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props as Props;
+const { Content } = await render(post);
+
+// Estimated from the raw markdown so fenced code can be discounted.
+const minutes = readingTime(post.body ?? '');
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  pubDate={post.data.pubDate}
+  updatedDate={post.data.updatedDate}
+  minutes={minutes}
+  tags={post.data.tags}
+>
+  <Content />
+</PostLayout>

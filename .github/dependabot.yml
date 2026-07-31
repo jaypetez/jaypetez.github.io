@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # Keep GitHub Actions used in workflows up to date. Actions are pinned to commit
+  # SHAs for the Scorecard pinned-dependencies check; Dependabot updates the SHA
+  # and the trailing version comment together.
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'ci'
+    labels:
+      - infra
+      - chore
+
+  # Keep the Astro toolchain and test dependencies current (routine version
+  # updates; security updates flow separately via the GitHub Advisory Database).
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'build'
+    labels:
+      - dependencies
+    groups:
+      # Astro and its official integrations move together; a split update
+      # usually just fails peer resolution.
+      astro:
+        patterns:
+          - 'astro'
+          - '@astrojs/*'
+      dev-tooling:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+          - 'prettier*'
+          - 'typescript'
+          - 'happy-dom'
+          - 'axe-core'

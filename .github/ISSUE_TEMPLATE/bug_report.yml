@@ -1,0 +1,61 @@
+name: Bug report
+description: Something on the site is broken, unreadable, or inaccessible.
+title: 'bug: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. If it's a security issue,
+        please use the private advisory link instead of a public issue.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+      placeholder: On /writing/, the post dates render as "Invalid Date".
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Page
+      description: Which page? A full URL is ideal.
+      placeholder: https://jaypetez.github.io/writing/
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Layout or styling
+        - Accessibility (keyboard, screen reader, contrast)
+        - Content or typo
+        - Performance
+        - Links or navigation
+        - Build or tests
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      description: Include the viewport width if it's a layout problem.
+      placeholder: Firefox 141 on Android, ~390px wide
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, console output, or steps to reproduce.
+    validations:
+      required: false

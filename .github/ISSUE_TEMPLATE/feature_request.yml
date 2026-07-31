@@ -1,0 +1,48 @@
+name: Feature or improvement
+description: Suggest a change to the site, its content, or its tooling.
+title: 'feat: '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the problem?
+      description: Describe the gap rather than jumping to a solution.
+      placeholder: There's no way to find posts by topic once there are more than a handful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you change?
+      description: If you have a specific idea, describe it here.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Content or writing
+        - Design or layout
+        - Accessibility
+        - Performance
+        - Tooling, tests, or CI
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints
+      description: |
+        This site deliberately ships almost no JavaScript and holds to a fixed
+        design token set (see CONTRIBUTING.md). Proposals that break those get
+        weighed against the cost.
+      options:
+        - label: I've read CONTRIBUTING.md and this fits the existing constraints
+          required: false

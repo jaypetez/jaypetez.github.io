@@ -1,0 +1,76 @@
+---
+/**
+ * Cycles system -> light -> dark. The only client-side JavaScript on the site
+ * (~700 bytes). The button is icon-free text so it needs no icon font, and it
+ * carries an aria-label because "Auto" alone doesn't say what it controls.
+ *
+ * The no-flash inline script that reads the stored preference lives in
+ * BaseLayout, where it can run before first paint.
+ */
+---
+
+<button id="theme-toggle" type="button" class="mono" aria-label="Colour theme: system">
+  <span data-theme-label>Auto</span>
+</button>
+
+<style>
+  button {
+    padding: var(--space-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-chip);
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+    transition:
+      color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease);
+  }
+
+  button:hover {
+    border-color: var(--color-accent);
+    color: var(--color-fg);
+  }
+</style>
+
+<script>
+  type Mode = 'system' | 'light' | 'dark';
+
+  const LABELS: Record<Mode, string> = { system: 'Auto', light: 'Light', dark: 'Dark' };
+  const ORDER: readonly Mode[] = ['system', 'light', 'dark'];
+
+  function read(): Mode {
+    const stored = localStorage.getItem('theme');
+    return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+  }
+
+  function apply(mode: Mode): void {
+    const root = document.documentElement;
+    if (mode === 'system') {
+      root.removeAttribute('data-theme');
+      localStorage.removeItem('theme');
+    } else {
+      root.setAttribute('data-theme', mode);
+      localStorage.setItem('theme', mode);
+    }
+
+    const button = document.getElementById('theme-toggle');
+    const label = button?.querySelector('[data-theme-label]');
+    if (label) label.textContent = LABELS[mode];
+    button?.setAttribute('aria-label', `Colour theme: ${mode}`);
+  }
+
+  function init(): void {
+    apply(read());
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const next = ORDER[(ORDER.indexOf(read()) + 1) % ORDER.length]!;
+      apply(next);
+    });
+  }
+
+  init();
+  // Re-run after client-side navigation so the button keeps working.
+  document.addEventListener('astro:after-swap', init);
+</script>

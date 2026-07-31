@@ -1,0 +1,45 @@
+{
+  "name": "jaypetez.github.io",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal site and blog for Jayson Petersen",
+  "homepage": "https://jaypetez.github.io/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaypetez/jaypetez.github.io.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run tests/unit tests/components tests/content tests/design",
+    "test:watch": "vitest tests/unit tests/components tests/content tests/design",
+    "test:built": "vitest run tests/build",
+    "coverage": "vitest run --coverage tests/unit tests/components tests/content tests/design",
+    "verify": "npm run check && npm run test && npm run build && npm run test:built",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.1.6"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@vitest/coverage-v8": "^4.1.10",
+    "axe-core": "^4.12.0",
+    "happy-dom": "^20.0.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

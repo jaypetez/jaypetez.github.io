@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="About Jayson Petersen — what I work on, how I build, and where to find me."
+>
+  <div class="wrap prose">
+    <h1>About</h1>
+
+    <p>
+      I&rsquo;m Jayson Petersen. I build AI agents and the infrastructure they run on: schedulers
+      that fetch and summarise, inference layers that spread load across whatever GPUs you have, and
+      assistants that plug into real tools rather than a chat box.
+    </p>
+
+    <p>
+      Most of what I release is self-hosted and model-agnostic by design. If a project needs an LLM,
+      it should work with the one you already run &mdash; local or hosted &mdash; and it should keep
+      working when you swap it.
+    </p>
+
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="https://github.com/jaypetez">github.com/jaypetez</a></li>
+      <li><a href="/rss.xml">RSS feed</a> for the writing</li>
+    </ul>
+
+    <h2>This site</h2>
+    <p>
+      Built with Astro, no client-side framework, and roughly 1.5&nbsp;KB of JavaScript on the wire
+      &mdash; a theme toggle and link prefetching, nothing more. The <a
+        href="https://github.com/jaypetez/jaypetez.github.io">source is public</a
+      >, including the tests that keep the design honest.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .wrap {
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    margin-bottom: var(--space-3);
+  }
+
+  h2 {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
+  }
+
+  p {
+    margin-bottom: var(--space-3);
+  }
+
+  ul {
+    padding-inline-start: var(--space-3);
+  }
+
+  li {
+    margin-bottom: var(--space-1);
+  }
+</style>
