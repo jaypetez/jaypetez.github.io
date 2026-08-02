@@ -1,0 +1,105 @@
+---
+/**
+ * The site's one ornament: an RFC-style ASCII figure of the stack these
+ * repositories implement. Agents on top, agent-gpu as the routing layer,
+ * Ollama nodes underneath. It is hand-aligned — edit it with a column ruler,
+ * and keep the wide variant under 60 characters and the narrow one under 36
+ * (tests/components/stack-figure.test.ts holds both ceilings).
+ *
+ * Two variants are swapped with a media query rather than scaled, so the art
+ * never shrinks below reading size and never scrolls sideways at 320px.
+ * Both carry role="img" with the same label; display:none keeps the hidden
+ * one out of the accessibility tree.
+ */
+const label =
+  'Diagram of the stack: glean, stride, and sidekick send requests to ' +
+  'agent-gpu, which routes them across GPU boxes and a phone running ' +
+  'ollama-mobile.';
+---
+
+<figure>
+  <pre
+    class="wide"
+    role="img"
+    aria-label={label}
+    is:raw>
+      glean          stride         sidekick
+   (feeds+LLM)     (run coach)     (MCP tools)
+        '--------.      |      .--------'
+                 v      v      v
+           +-------------------------+
+           |        agent-gpu        |
+           |  one API for the fleet  |
+           +-+--------+------+-------+
+             |        |      |
+       .-----'        |      '--------.
+       v              v               v
+  +---------+    +---------+  +---------------+
+  | gpu box |    | gpu box |  |     phone     |
+  | ollama  |    | ollama  |  | ollama-mobile |
+  +---------+    +---------+  +---------------+</pre>
+  <pre
+    class="narrow"
+    role="img"
+    aria-label={label}
+    is:raw>
+    glean . stride . sidekick
+                |
+                v
+         +-------------+
+         |  agent-gpu  |
+         +------+------+
+                |
+    .-------+---+--------.
+    v       v            v
+ +-----+ +-----+ +---------------+
+ | gpu | | gpu | | ollama-mobile |
+ +-----+ +-----+ +---------------+</pre>
+  <figcaption>fig 1 &middot; the stack, as deployed</figcaption>
+</figure>
+
+<style>
+  figure {
+    width: fit-content;
+    margin: var(--space-6) auto 0;
+  }
+
+  pre {
+    /* Ligatures would fuse the arrows and dashes; alignment dies with them. */
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-variant-ligatures: none;
+    tab-size: 8;
+    letter-spacing: 0;
+    line-height: 1.3;
+    color: var(--color-muted);
+  }
+
+  /* The narrow render is 34 columns; half an em per character means it fits a
+     320px viewport at full size, so neither variant is ever scaled down. */
+  .narrow {
+    font-size: clamp(0.8125rem, calc((100vw - 3rem) / 17), 1rem);
+  }
+
+  .wide {
+    display: none;
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 30rem) {
+    .narrow {
+      display: none;
+    }
+
+    .wide {
+      display: block;
+    }
+  }
+
+  figcaption {
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+</style>

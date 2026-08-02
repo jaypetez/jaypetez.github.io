@@ -9,37 +9,40 @@ const { project } = Astro.props;
 ---
 
 <article class="row">
-  <h3>
-    <a href={project.repo} rel="noopener">{project.name}</a>
-  </h3>
-
-  <p class="description">{project.description}</p>
-
-  <p class="meta mono">
-    <span>{project.language}</span>
-    <span aria-hidden="true">&middot;</span>
-    <span>{project.license}</span>
-    {
-      project.stars !== undefined && (
-        <>
-          <span aria-hidden="true">&middot;</span>
-          {/* The glyph is decorative; the number needs the word for screen readers. */}
+  <!--
+    The ledger line: name, language, licence, stars on fixed ch-wide columns,
+    so the alignment holds across every row the way `ls -l` output does. The
+    column widths are set for the longest values in src/data/projects.ts
+    (ollama-mobile, TypeScript, Apache-2.0).
+  -->
+  <div class="ledger">
+    <h3>
+      <a href={project.repo} rel="noopener">{project.name}</a>
+    </h3>
+    <span class="lang">{project.language}</span>
+    <span class="license">{project.license}</span>
+    <span class="tail">
+      {
+        project.stars !== undefined && (
           <span>
+            {/* The glyph is decorative; the number needs the word for screen readers. */}
             <span aria-hidden="true">&#9733;</span>
             <span class="visually-hidden">GitHub stars:</span>
             {project.stars}
           </span>
-        </>
-      )
-    }
-    {
-      project.docs && (
-        <a class="docs" href={project.docs}>
-          Docs
-        </a>
-      )
-    }
-  </p>
+        )
+      }
+      {
+        project.docs && (
+          <a class="docs" href={project.docs}>
+            docs
+          </a>
+        )
+      }
+    </span>
+  </div>
+
+  <p class="description">{project.description}</p>
 </article>
 
 <style>
@@ -54,9 +57,34 @@ const { project } = Astro.props;
     border-top: 1px solid var(--color-border);
   }
 
+  .ledger {
+    display: grid;
+    grid-template-areas: 'name lang license tail';
+    /* Sized to the longest value each column holds, plus one space, exactly
+       the way `ls` pads its columns — contiguous, not justified apart. */
+    grid-template-columns: 15ch 11ch 11ch auto;
+    align-items: baseline;
+    column-gap: 1ch;
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  /* Below ~384px the full line cannot hold 42 columns at a readable size, so
+     the metadata drops to a second line — still on the same column grid. */
+  @media (max-width: 24rem) {
+    .ledger {
+      grid-template-areas:
+        'name name tail'
+        'lang license license';
+      grid-template-columns: 15ch 11ch auto;
+      row-gap: var(--space-1);
+    }
+  }
+
   h3 {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: var(--text-base);
+    grid-area: name;
+    font-size: inherit;
     font-weight: 500;
     letter-spacing: 0;
   }
@@ -71,22 +99,23 @@ const { project } = Astro.props;
     text-decoration-color: currentcolor;
   }
 
+  .lang {
+    grid-area: lang;
+  }
+
+  .license {
+    grid-area: license;
+  }
+
+  .tail {
+    display: flex;
+    grid-area: tail;
+    gap: var(--space-2);
+  }
+
   .description {
     max-width: var(--measure);
-    margin-top: var(--space-1);
-    color: var(--color-muted);
-  }
-
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1);
-    align-items: baseline;
     margin-top: var(--space-2);
     color: var(--color-muted);
-  }
-
-  .docs {
-    margin-inline-start: auto;
   }
 </style>

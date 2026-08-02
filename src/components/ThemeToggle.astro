@@ -14,24 +14,25 @@
 </button>
 
 <style>
+  /* No border box: the toggle sits in the header as a peer of the nav
+     labels, distinguished by being lowercase — a config value, not a page. */
   button {
     padding: var(--space-1);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-chip);
+    border: 0;
     background: transparent;
     color: var(--color-muted);
     font: inherit;
     letter-spacing: inherit;
-    text-transform: inherit;
+    text-transform: lowercase;
     cursor: pointer;
-    transition:
-      color var(--duration) var(--ease),
-      border-color var(--duration) var(--ease);
+    transition: color var(--duration) var(--ease);
   }
 
   button:hover {
-    border-color: var(--color-accent);
     color: var(--color-fg);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule);
+    text-underline-offset: 0.3em;
   }
 </style>
 

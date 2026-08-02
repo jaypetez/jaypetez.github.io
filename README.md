@@ -11,15 +11,22 @@ the wire. Static HTML, self-hosted fonts, and a design system that a test suite 
 
 ## Why it looks the way it does
 
-The design is deliberately not the default. Generic AI-generated sites converge on the same handful
-of choices — Inter, a purple-to-blue gradient, a grid of identically rounded cards — so this site
-refuses all three, and `tests/design/tokens.test.ts` fails the build if any of them come back.
+The reference points are plain-text engineering artifacts: RFC figures, `ls -l` column alignment,
+the man page. One rule holds it together — structure (names, labels, dates, navigation) is
+monospace, prose is serif — and one ornament spends the whole decoration budget: the hand-aligned
+ASCII diagram of the stack on the home page, which is also a map of the projects listed under it.
+The palette is a two-colour printer ribbon: ink on paper, with the red band as the single accent.
 
-The structure is Swiss Modernism (8px base unit, one accent hue, rules instead of boxes); the
-typography is editorial (Source Serif 4 for prose, JetBrains Mono for metadata). Every design value
-lives in `src/styles/global.css` as a token — components never hard-code them.
+The faces are Iosevka (vendored and subset by hand in `src/assets/fonts`, ~16 KB a weight) and
+Source Serif 4. No CSS framework, no icon font, no fake terminal effects — no blinking cursor, no
+typewriter reveal, no scanlines.
 
-The rules are in `tests/design/tokens.test.ts` if you want the exact list.
+Generic AI-generated sites converge on the same handful of choices — Inter, a purple-to-blue
+gradient, a grid of identically rounded cards — and `tests/design/tokens.test.ts` fails the build
+if any of them come back. `tests/components/stack-figure.test.ts` does the same for the diagram:
+width ceilings per variant, pure printable ASCII, `role="img"` with a label that says what it
+shows. Every design value lives in `src/styles/global.css` as a token — components never
+hard-code them.
 
 ## Local development
 

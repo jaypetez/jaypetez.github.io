@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectRow from '../components/ProjectRow.astro';
 import PostMeta from '../components/PostMeta.astro';
+import StackFigure from '../components/StackFigure.astro';
 import { projects } from '../data/projects';
 import { latest } from '../lib/posts';
 
@@ -19,6 +20,7 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
       I build agents that do real work, and the infrastructure that keeps them running &mdash;
       self-hosted, model-agnostic, and open source.
     </p>
+    <StackFigure />
   </section>
 
   <section aria-labelledby="work">
@@ -35,7 +37,7 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
         <ul class="posts">
           {posts.map((post) => (
             <li>
-              <h3>
+              <h3 class="title">
                 <a href={`/writing/${post.id}/`}>{post.data.title}</a>
               </h3>
               <PostMeta pubDate={post.data.pubDate} tags={post.data.tags} />
@@ -52,6 +54,11 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
 <style>
   .intro {
     padding-block: var(--space-8) var(--space-6);
+  }
+
+  /* Fluid between the two scale steps so the name never wraps at 320px. */
+  .intro h1 {
+    font-size: clamp(var(--text-2xl), 7.5vw, var(--text-3xl));
   }
 
   .lede {

@@ -48,6 +48,9 @@ const { pubDate, updatedDate, minutes, tags = [] } = Astro.props;
     flex-wrap: wrap;
     gap: var(--space-1);
     align-items: baseline;
+    /* Kept to the prose measure so the tags sit with the text they describe
+       rather than drifting to the far page edge. */
+    max-width: var(--measure);
     color: var(--color-muted);
   }
 

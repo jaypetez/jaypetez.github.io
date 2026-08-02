@@ -22,7 +22,7 @@ function isCurrent(href: string): boolean {
 
 <header class="site-header">
   <div class="page bar">
-    <a class="wordmark mono" href="/">JP</a>
+    <a class="wordmark" href="/">jaypetez</a>
 
     <nav aria-label="Main">
       <ul>
@@ -58,9 +58,25 @@ function isCurrent(href: string): boolean {
     min-height: var(--space-6);
   }
 
+  /* The bar holds 40-odd characters of chrome; below ~416px the gaps give
+     way before the labels do, so nothing ever clips at 320px. */
+  @media (max-width: 26rem) {
+    .bar {
+      gap: var(--space-2);
+    }
+
+    ul {
+      gap: var(--space-1);
+    }
+  }
+
+  /* The username, as typed — lowercase, so it stays out of the .mono utility
+     that uppercases the nav labels around it. */
   .wordmark {
     color: var(--color-fg);
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
     font-size: var(--text-sm);
+    font-weight: 500;
     text-decoration: none;
   }
 

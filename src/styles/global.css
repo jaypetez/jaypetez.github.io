@@ -3,10 +3,12 @@
  * Components must reference these variables rather than hard-coding values;
  * tests/design/tokens.test.ts enforces the rules that keep the look coherent.
  *
- * The system is Swiss Modernism in structure (strict rhythm, 8px base unit,
- * rules instead of boxes, one accent) with editorial typography: a serif for
- * prose, a monospace for metadata. There are deliberately no gradients, no
- * decorative shadows, and no rounded cards.
+ * The reference points are plain-text engineering artifacts: RFC figures,
+ * `ls -l` alignment, the man page. The rule that holds it together: everything
+ * that is structure (names, labels, dates, headings-as-labels, the interface)
+ * is monospace; everything that is prose is serif — typeset text under
+ * plain-text chrome. There are deliberately no gradients, no decorative
+ * shadows, no rounded cards, and no fake terminal effects.
  */
 
 :root {
@@ -49,45 +51,49 @@
   --duration: 150ms;
   --ease: cubic-bezier(0.2, 0, 0.4, 1);
 
-  /* ---- Color: monochrome plus exactly one accent hue (~19deg) ---- */
-  --color-bg: #fafaf9;
-  --color-fg: #18181b; /* 16.96:1 on bg */
-  --color-muted: #57534e; /*  7.30:1 on bg */
-  --color-border: #e7e5e4;
-  --color-rule: #d6d3d1;
-  --color-accent: #9a3412; /*  7.00:1 on bg */
-  --color-surface: #f4f4f2;
-  --color-selection: #f0dcd2;
+  /*
+   * ---- Color: the two-tone ribbon ----
+   * Mined from line-printer output: ribbon black on paper, with the red band
+   * of a two-colour ribbon as the single accent. Palette names in comments.
+   */
+  --color-bg: #f4f4f1; /* paper — neutral grey-white, not cream */
+  --color-fg: #20201d; /* ink — 14.7:1 on bg */
+  --color-muted: #57554f; /* graphite — 6.5:1 on bg */
+  --color-border: #dcdad4; /* hairline */
+  --color-rule: #c9c6bd; /* hairline, drawn heavier */
+  --color-accent: #b42318; /* ribbon red — 6.0:1 on bg */
+  --color-surface: #ecebe5; /* platen — code blocks and chips */
+  --color-selection: #f3d9d5; /* ribbon at a whisper */
 
   color-scheme: light;
 }
 
-/* Dark mode is a designed pass, not an inversion: warm near-black, softened
-   foreground, and a lifted accent that holds its contrast. */
+/* Dark mode is reverse video, not an inversion: the paper tones drop out and
+   the ink tones lift, with the ribbon red raised until it holds its contrast. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --color-bg: #0c0a09;
-    --color-fg: #fafaf9; /* 18.92:1 on bg */
-    --color-muted: #a8a29e; /*  7.83:1 on bg */
-    --color-border: #292524;
-    --color-rule: #3a3532;
-    --color-accent: #fb7a45; /*  7.50:1 on bg */
-    --color-surface: #17130f;
-    --color-selection: #45241a;
+    --color-bg: #151412; /* paper, unlit */
+    --color-fg: #e8e6df; /* ink, reversed — 13.9:1 on bg */
+    --color-muted: #a5a29a; /* graphite — 7.0:1 on bg */
+    --color-border: #2c2a27; /* hairline */
+    --color-rule: #3b3833; /* hairline, drawn heavier */
+    --color-accent: #ff6f61; /* ribbon red, lifted — 6.6:1 on bg */
+    --color-surface: #1e1d1a; /* platen */
+    --color-selection: #4a221d;
 
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --color-bg: #0c0a09;
-  --color-fg: #fafaf9;
-  --color-muted: #a8a29e;
-  --color-border: #292524;
-  --color-rule: #3a3532;
-  --color-accent: #fb7a45;
-  --color-surface: #17130f;
-  --color-selection: #45241a;
+  --color-bg: #151412;
+  --color-fg: #e8e6df;
+  --color-muted: #a5a29a;
+  --color-border: #2c2a27;
+  --color-rule: #3b3833;
+  --color-accent: #ff6f61;
+  --color-surface: #1e1d1a;
+  --color-selection: #4a221d;
 
   color-scheme: dark;
 }
@@ -152,13 +158,16 @@ video {
 
 /* ----------------------------------------------------------- typography ---- */
 
+/* Headings are structure, and structure is monospace. Titles of written
+   works opt back into the serif with .title below. */
 h1,
 h2,
 h3,
 h4 {
-  font-weight: 600;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 500;
   line-height: var(--leading-tight);
-  letter-spacing: -0.015em;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
@@ -219,7 +228,39 @@ pre {
   background: var(--color-surface);
 }
 
+/*
+ * Shiki renders both theme palettes into every token as custom properties but
+ * ships no CSS to switch them; without these rules, dark mode shows the light
+ * token colours. Mirrors the two dark-mode selectors used for the tokens
+ * above, so highlighting follows the same auto/light/dark logic as the site.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+  }
+}
+
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
 /* ------------------------------------------------------------- utilities ---- */
+
+/* The title of a written work is typeset, not chrome: serif over the mono
+   heading default. Applied to essay titles wherever they appear. */
+.title {
+  font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
 
 /* Mono metadata: uppercase, widely tracked, small. Used for nav, dates, tags,
    and section labels — never for prose. */
@@ -235,6 +276,14 @@ pre {
   max-width: var(--page-max);
   margin-inline: auto;
   padding-inline: var(--space-3);
+}
+
+/* One step tighter below ~416px, so the header chrome and the 34-column
+   figure both clear a 320px viewport with room to spare. */
+@media (max-width: 26rem) {
+  .page {
+    padding-inline: var(--space-2);
+  }
 }
 
 .prose {

@@ -17,7 +17,7 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
 <BaseLayout title={title} description={description} type="article">
   <article class="post">
     <header>
-      <h1>{title}</h1>
+      <h1 class="title">{title}</h1>
       <PostMeta pubDate={pubDate} updatedDate={updatedDate} minutes={minutes} tags={tags} />
     </header>
 
@@ -52,14 +52,20 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
 
   /* Prose styling is global rather than scoped because the markdown renderer
      emits these elements outside this component's scope. */
+
+  /* Section headings inside an essay are mono (the man-page contrast: plain-
+     text structure over typeset prose), one step down from their global size
+     so they label the text rather than shout over it. */
   .body :global(h2) {
     margin-top: var(--space-6);
     margin-bottom: var(--space-2);
+    font-size: var(--text-lg);
   }
 
   .body :global(h3) {
     margin-top: var(--space-4);
     margin-bottom: var(--space-1);
+    font-size: var(--text-base);
   }
 
   .body :global(p),
@@ -82,7 +88,8 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
 
   .body :global(blockquote) {
     padding-inline-start: var(--space-2);
-    border-inline-start: 2px solid var(--color-accent);
+    /* A quiet rule, not the accent — red is reserved for links and focus. */
+    border-inline-start: 2px solid var(--color-rule);
     color: var(--color-muted);
     font-style: italic;
   }
@@ -92,6 +99,9 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
     overflow-x: auto;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-none);
+    /* Shiki inlines its own theme background; the token wins so code sits on
+       the same platen surface as every other chip on the site. */
+    background: var(--color-surface) !important;
     font-size: var(--text-sm);
     line-height: 1.5;
   }

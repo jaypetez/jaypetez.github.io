@@ -46,13 +46,20 @@ export default defineConfig({
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },
     {
-      provider: fontProviders.google(),
-      name: 'JetBrains Mono',
+      // Vendored and subset by hand (ASCII, Latin-1, and the handful of
+      // punctuation glyphs the site uses) because the upstream latin build is
+      // ~1 MB per weight. The subset lives in src/assets/fonts with its OFL
+      // licence; regenerate with pyftsubset if the glyph list ever grows.
+      provider: fontProviders.local(),
+      name: 'Iosevka',
       cssVariable: '--font-mono',
-      weights: [400, 500],
-      styles: ['normal'],
-      subsets: ['latin'],
       fallbacks: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],
+      options: {
+        variants: [
+          { src: ['./src/assets/fonts/iosevka-latin-400.woff2'], weight: 400, style: 'normal' },
+          { src: ['./src/assets/fonts/iosevka-latin-500.woff2'], weight: 500, style: 'normal' },
+        ],
+      },
     },
   ],
   markdown: {
