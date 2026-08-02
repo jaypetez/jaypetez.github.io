@@ -5,6 +5,7 @@ describe('projects data', () => {
   it('lists every public project', () => {
     expect(projects.map((p) => p.name)).toEqual([
       'glean',
+      'ollama-mobile',
       'stride',
       'sidekick',
       'agent-gpu',

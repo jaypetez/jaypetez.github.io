@@ -35,6 +35,14 @@ export const projects: readonly Project[] = [
     stars: 6,
   },
   {
+    name: 'ollama-mobile',
+    description:
+      'An Android app for Ollama. It embeds llama.cpp to run GGUF models on the phone, works as a full client for a server on your LAN, and can expose its own Ollama-compatible API — routing each request to whichever is already warm.',
+    language: 'Kotlin',
+    license: 'MIT',
+    repo: 'https://github.com/jaypetez/ollama-mobile',
+  },
+  {
     name: 'stride',
     description:
       'An agentic Strava coach. It reads your training history and tells you what to run next, rather than just plotting what you already did.',
