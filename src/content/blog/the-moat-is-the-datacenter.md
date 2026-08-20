@@ -1,152 +1,133 @@
 ---
 title: "Frontier labs don't have a moat. Their landlords do."
-description: 'Open weights sit months behind the frontier at a tenth of the price, yet enterprise spend went the other way. On why the durable moat is infrastructure.'
+description: 'Open models are months behind at a tenth of the price, yet enterprise spend went the other way. Why I think the durable moat belongs to the clouds.'
 pubDate: 2026-08-19
 tags: ['ai', 'strategy', 'infrastructure', 'open-source']
 ---
 
-In May 2023 a leaked Google memo declared "we have no moat, and neither does
-OpenAI." Three years on, the memo looks right about the models and wrong about
-the business — and the gap between those two things is where the next decade of
-this industry gets decided.
+Most of the inference I run at home goes through open-weights models. That's
+what [agent-gpu](https://github.com/jaypetez/agent-gpu) is for: route requests
+across a few GPU boxes running Ollama and stop thinking about API bills. For
+bulk work, the tagging and summarization that makes up most of what I actually
+automate, open models stopped being a compromise a while ago.
 
-The models did commoditize. The best open-weights models now trail the closed
-frontier by [about four months on Epoch's capability
-index](https://epoch.ai/data-insights/open-closed-eci-gap), and the [UK AI
-Security Institute measures a 4–7 month
-lag](https://www.aisi.gov.uk/blog/how-far-behind-the-frontier-are-leading-open-weight-models-on-cyber)
-on cyber tasks — narrower than a year ago. On [Artificial Analysis's
-intelligence-versus-price
+So I'm predisposed to agree when people argue the frontier labs are in
+trouble, and the capability data mostly backs them up. [Epoch measures the
+best open models about four months behind the closed
+frontier](https://epoch.ai/data-insights/open-closed-eci-gap). The [UK AI
+Security Institute puts the lag at four to seven
+months](https://www.aisi.gov.uk/blog/how-far-behind-the-frontier-are-leading-open-weight-models-on-cyber)
+on cyber tasks, narrower than a year ago. On [Artificial Analysis's
+intelligence-per-dollar
 chart](https://artificialanalysis.ai/articles/recent-open-weights-model-launches),
-nine of the thirteen models on the Pareto frontier are open weights, at
-somewhere between a fifth and a thirtieth of frontier API prices. Kimi, GLM,
-and DeepSeek are genuinely good, and on developer-facing routers open models
-are now a [majority of token
-volume](https://openrouter.ai/blog/insights/the-open-weight-models-that-matter-june-2026/).
+nine of the thirteen models on the Pareto frontier are open weights, priced at
+a fifth to a thirtieth of the frontier APIs. The leaked 2023 Google memo ("we
+have no moat, and neither does OpenAI") called all of this three years early.
 
-And yet the commoditization thesis predicted price collapse and lab implosion,
-and instead 2026 delivered Anthropic at a $65B revenue run rate, OpenAI above
-$40B, and both heading toward IPOs. Something in the "no moat" story doesn't
-add up, and I don't think it's the benchmarks.
+And yet Anthropic ended July at a $65B revenue run rate, OpenAI is above
+$40B, and both are heading toward IPOs. Commodities don't produce numbers
+like that. Somewhere the no-moat story has a hole in it.
 
-## The paradox that explains everything
+## The number that doesn't fit
 
-Here's the datapoint I keep coming back to. While open-weights models were
-closing the capability gap and Chinese open models were peaking at [46% of
-tokens routed through
-OpenRouter](https://www.cnbc.com/2026/07/07/chinese-ai-models-costs-us-openai-anthropic.html),
 [Menlo Ventures' enterprise
 survey](https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/)
-found open-weights' share of enterprise LLM API spend *falling*, from 19% to
-11%. Chinese open models — the ones actually at the frontier of open weights —
-sit at roughly 1% of enterprise usage.
+found open models' share of enterprise LLM API spend falling from 19% to 11%
+over the same stretch in which they nearly closed the capability gap. Chinese
+open models, the ones actually at the open frontier, sit around 1% of
+enterprise usage. Meanwhile on OpenRouter, [Chinese open models peaked at 46%
+of routed
+tokens](https://www.cnbc.com/2026/07/07/chinese-ai-models-costs-us-openai-anthropic.html).
+Developers went one way. Enterprises went the other.
 
-Capability went up and to the right; enterprise adoption went the other way.
-That only looks like a paradox if you believe enterprises buy benchmarks. They
-don't. They buy things a benchmark never measures: FedRAMP authorization, zero
-data retention they can enforce with a policy rather than trust in a blog
-post, a vendor who published a safety framework before shipping, someone to
-sue, and — above all — a procurement path that doesn't require onboarding a
-new counterparty. A model that scores three points lower but arrives through
-an already-negotiated contract wins almost every time.
+I don't think that's a paradox. I think it's what buying software at a big
+company actually looks like, and benchmark charts just don't model it.
 
-## Multi-model isn't a prediction anymore
+Take a bank that wants a model in a customer-facing workflow. The questions
+that decide the purchase are: is this FedRAMP authorized, can our auditors
+see a zero-data-retention guarantee enforced by policy rather than promised
+in a blog post, did the vendor publish a safety framework before shipping,
+and who do we sue when it goes wrong. A model that scores three points lower
+on some index but clears those questions wins far more often than the
+leaderboard says it should.
 
-The second thing the data settles: the single-vendor future is already dead.
-[a16z's CIO survey](https://a16z.com/leaders-gainers-and-unexpected-winners-in-the-enterprise-ai-arms-race/)
-has 81% of large enterprises running three or more model families, 37% running
-five or more, with "different models are better at different things" as the
-stated reason. Spend share is whiplashing — OpenAI went from 50% of enterprise
-API spend in 2023 to 27%, Anthropic from 12% to 40% — and a market where the
-leader changes that fast is structurally a portfolio market, because every CIO
-who lived through one swing now architects for the next one.
+This is also where the labs quietly lose control of their own distribution,
+because the entity that clears those questions is usually not the lab. Claude
+got FedRAMP High [through Bedrock on
+GovCloud](https://www.anthropic.com/news/claude-in-amazon-bedrock-fedramp-high).
+Zero data retention on AWS is enforced with [service control
+policies](https://aws.amazon.com/blogs/security/enforce-zero-data-retention-on-amazon-bedrock-with-bedrock-projects-and-service-control-policies/),
+an AWS mechanism, not an Anthropic one. EU data residency runs through
+sovereign regions like the EU-only cloud AWS stood up in January for €7.8B.
+And the purchase itself usually draws down a committed-spend agreement (an
+EDP on AWS, a MACC on Azure) that the company negotiated years ago, so adding
+a frontier model needs no new vendor onboarding, no new security review, no
+new budget line. The cloud already won the trust argument. The model rides
+along.
 
-The tells are everywhere. Microsoft, holder of a ~$13B OpenAI stake, [added
-Claude to Microsoft 365
-Copilot](https://www.microsoft.com/en-us/microsoft-365/blog/2025/09/24/expanding-model-choice-in-microsoft-365-copilot/).
-Perplexity runs GPT, Claude, and Gemini in parallel and synthesizes. Every
-serious coding tool ships a model picker. And this August, Stripe agreed to
-pay over $7B for OpenRouter — a company whose entire product is *making models
-interchangeable*. When a payments giant pays seven billion dollars for the
-switching layer, the market has told you what it thinks the durable position
-is, and it isn't any particular model.
-
-## Follow the revenue through the datacenter
-
-So if capability depreciates in months and customers hold portfolios, where
-does defensibility actually live? Follow how the money physically moves.
-
-By [SemiAnalysis's
+The revenue is starting to show it. By [SemiAnalysis's
 numbers](https://newsletter.semianalysis.com/p/anthropic-growth-and-bedrock-mix),
 over 40% of Anthropic's revenue now arrives through Bedrock, Foundry, and
-Vertex — the hyperscaler shelves — and that share is rising. The reasons are
-mundane, which is exactly why they're durable:
-
-| What the enterprise needs | Who provides it |
-| --- | --- |
-| FedRAMP High / IL5 authorization | The cloud, not the lab — Claude got there [via Bedrock GovCloud](https://www.anthropic.com/news/claude-in-amazon-bedrock-fedramp-high) |
-| Enforceable zero data retention | [Service control policies on Bedrock](https://aws.amazon.com/blogs/security/enforce-zero-data-retention-on-amazon-bedrock-with-bedrock-projects-and-service-control-policies/), Azure's approval-gated ZDR |
-| EU data residency post-AI Act | Sovereign clouds — AWS just stood up a [€7.8B EU-only region](https://tech-insider.org/bedrock-vs-azure-ai-foundry-vs-vertex-ai-2026/) |
-| Procurement without a new vendor | Model spend draws down existing EDP/MACC commitments |
-
-That last row is the quiet killer. When Bedrock usage counts against a
-committed-spend agreement the company signed two years ago, buying a frontier
-model requires no security review, no new master services agreement, no
-budget line. The hyperscaler already won the trust negotiation; the model just
-rides it. And with EU AI Act enforcement — real fines — [live as of this
+Vertex rather than its own front door, and that share is rising. With [EU AI
+Act enforcement live as of this
 month](https://www.dlapiper.com/en-us/insights/publications/2025/08/latest-wave-of-obligations-under-the-eu-ai-act-take-effect),
-the value of buying models inside a compliance-managed platform only goes up.
+real fines included, I'd expect it to keep rising. Compliance is a product.
+The clouds are the ones selling it, and every model on the shelf pays rent.
 
-The labs know this, which is why the deal flow of the last twelve months looks
-the way it does: OpenAI committing $250B to Azure while diversifying into
-Oracle, CoreWeave, and AWS; Anthropic deliberately tri-cloud across Trainium,
-TPUs, and Azure; Claude becoming the only frontier model sold on all three
-hyperscalers. Every one of those deals trades margin for shelf space and
-guaranteed compute. The labs are becoming anchor tenants in someone else's
-mall — extraordinary tenants, but tenants.
+## Multi-model already happened
 
-## What's actually left for the labs
+This half of the argument barely needs making anymore. [a16z's CIO
+survey](https://a16z.com/leaders-gainers-and-unexpected-winners-in-the-enterprise-ai-arms-race/)
+has 81% of large enterprises running three or more model families, 37%
+running five or more. Enterprise spend share whiplashed from OpenAI at 50% in
+2023 down to 27% while Anthropic went from 12% to 40%. Microsoft, which owns
+roughly $13B of OpenAI, [added Claude to Microsoft 365
+Copilot](https://www.microsoft.com/en-us/microsoft-365/blog/2025/09/24/expanding-model-choice-in-microsoft-365-copilot/)
+anyway. And in August, Stripe agreed to pay over $7B for OpenRouter, a
+company whose entire product is making models interchangeable.
 
-I don't think the labs are doomed — $65B run rates are not a rounding error —
-but I think their durable assets are narrower than their valuations imply:
+You could argue with any one of those facts. Together they describe a market
+that has already decided to treat models as a portfolio, routed per task and
+swapped when the leaderboard flips. Every CIO who lived through one share
+swing now architects for the next one.
 
-- **Locked-in compute.** Demand for training compute exceeds what the grid can
-  add by an order of magnitude; whoever pre-bought gigawatts owns a real,
-  physical moat for a few years. But it's a moat made of other people's
-  datacenters, and it expires.
-- **The agentic workload.** Claude Code owning half the AI-coding market shows
-  a lab can own a *workflow* rather than a model. Workflows have switching
-  costs; raw completions don't. This is the strongest lab-native moat going —
-  and MCP going cross-vendor shows how fast even that layer gets standardized.
-- **Post-training know-how.** RL environments and reward design don't leak in
-  a weights file. Real, but it's a six-month head start renewed by burning
-  billions, not a wall.
+## What the labs keep
 
-Each of those is a rent that decays. The hyperscaler position — compliance
-certifications, sovereign regions, enterprise contracts, the power hookups
-themselves — compounds instead.
+I'm not writing the labs' obituary; a $65B run rate is not what dying looks
+like. They hold three real assets, and they're worth taking one at a time.
 
-## Where I land
+Pre-bought compute is the first. Training demand exceeds what the grid can
+add by an order of magnitude, so whoever locked in gigawatts early (OpenAI's
+$250B Azure commitment plus Oracle and CoreWeave, Anthropic spread across
+Trainium, TPUs, and Azure) owns something physical and genuinely scarce. But
+notice whose datacenters those are. The moat is leased.
 
-The future is multi-model: portfolios of frontier and open-weights models,
-routed by task, bought overwhelmingly through the two or three clouds an
-enterprise already trusts. Frontier labs keep a franchise by being on every
-shelf and owning the workflows that sit above the model — not by the model
-itself, whose lead is now a reliably four-month-wide, rapidly refilling ditch.
-The open-weights labs win developers and lose procurement. And the durable
-moat — the one that will still be collecting tolls in 2035 — belongs to
-whoever guarantees an auditor, a regulator, and a CISO a quiet night: mostly
-the hyperscalers, cutting decade-long deals with everyone on both sides of
-the open/closed divide.
+Workflows are the second. Claude Code reportedly holds about half the
+AI-coding market, and a workflow has switching costs in a way a completion
+endpoint never will. Of the three this is the one I take most seriously, and
+also the one I'm least sure about: MCP made tool integrations portable across
+vendors in about a year, and I can see agent harnesses commoditizing the same
+way. Ask me again in twelve months.
 
-The model is the SKU. The cloud is the store. Stores outlive products.
+Post-training know-how is the third. RL environments and reward design don't
+leak in a weights file. That's real, but the open labs replicate it on
+roughly the same four-month schedule as everything else, and a head start you
+renew by spending billions a year is a strange thing to call a moat.
+
+So, the actual prediction: by 2030 every large company runs a portfolio of
+frontier and open models, buys nearly all of it through whichever one or two
+clouds already passed its audits, and the clouds collect a toll on every
+token from both sides of the open/closed divide. The labs that stay enormous
+will be the ones that accepted being products on someone else's shelf, the
+way Claude already is on all three clouds. I might be wrong about which labs
+make it. I don't think I'm wrong about the shelf.
 
 ---
 
-Further reading: [Epoch AI on the open–closed
-gap](https://epoch.ai/data-insights/open-closed-eci-gap), [Menlo Ventures'
-State of Generative AI in the
-Enterprise](https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/),
-[a16z's enterprise AI survey](https://a16z.com/leaders-gainers-and-unexpected-winners-in-the-enterprise-ai-arms-race/),
+If you want the underlying data: [Epoch on the open–closed
+gap](https://epoch.ai/data-insights/open-closed-eci-gap), [Menlo's enterprise
+survey](https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/),
+[a16z's CIO
+survey](https://a16z.com/leaders-gainers-and-unexpected-winners-in-the-enterprise-ai-arms-race/),
 and [SemiAnalysis on Anthropic's channel
 mix](https://newsletter.semianalysis.com/p/anthropic-growth-and-bedrock-mix).
