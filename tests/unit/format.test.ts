@@ -43,6 +43,18 @@ describe('readingTime', () => {
     expect(readingTime(prose + '\n' + code)).toBe(1);
   });
 
+  it('discounts figures, whose art and aria-label are not prose', () => {
+    const prose = 'word '.repeat(200);
+    const figure =
+      '<figure>\n<pre role="img" aria-label="' +
+      'a long description of the drawing '.repeat(20) +
+      '">\n' +
+      '+---+\n| a |\n+---+\n'.repeat(50) +
+      '</pre>\n<figcaption>fig 1 &middot; a drawing</figcaption>\n</figure>';
+    // The label alone would otherwise add minutes to a post nobody reads longer.
+    expect(readingTime(prose + '\n' + figure)).toBe(1);
+  });
+
   it('ignores punctuation-only tokens', () => {
     expect(readingTime('--- *** ... ///')).toBe(1);
   });

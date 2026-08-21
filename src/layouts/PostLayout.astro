@@ -72,6 +72,7 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
   .body :global(ul),
   .body :global(ol),
   .body :global(pre),
+  .body :global(figure),
   .body :global(blockquote),
   .body :global(table) {
     margin-bottom: var(--space-3);
@@ -104,6 +105,39 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
     background: var(--color-surface) !important;
     font-size: var(--text-sm);
     line-height: 1.5;
+  }
+
+  /* A figure in a post is ASCII drawing, not code, so it gives up the code
+     block's border and platen and keeps only what holds the art together.
+     Same idiom as StackFigure on the home page; the styles live here because
+     markdown output sits outside any component's scope. */
+  .body :global(figure) {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+
+  .body :global(figure pre) {
+    padding: 0;
+    border: 0;
+    /* The rule above sets the platen with !important, so this has to answer. */
+    background: none !important;
+    /* Ligatures would fuse the arrows and dashes; alignment dies with them. */
+    font-variant-ligatures: none;
+    /* Post figures are capped at 44 columns (tests/content/post-figures.test.ts).
+       At half an em per character that fits a 320px viewport without ever
+       scaling below reading size, so the art never scrolls sideways. */
+    font-size: clamp(0.6875rem, calc((100vw - 3rem) / 22), var(--text-sm));
+    line-height: 1.3;
+    color: var(--color-muted);
+  }
+
+  .body :global(figcaption) {
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: var(--text-xs);
+    text-align: center;
   }
 
   .body :global(hr) {
