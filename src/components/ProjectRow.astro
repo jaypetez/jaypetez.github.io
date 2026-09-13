@@ -39,6 +39,13 @@ const { project } = Astro.props;
           </a>
         )
       }
+      {
+        project.live && (
+          <a class="live" href={project.live}>
+            try it
+          </a>
+        )
+      }
     </span>
   </div>
 

@@ -77,7 +77,9 @@ from the build, the feed, and the sitemap.
 
 The home page list is hand-curated in `src/data/projects.ts` — edit that one file. Tests assert every
 entry has a valid `https://github.com/jaypetez/<name>` URL, a license from the allowed set, and a
-description that reads as a real sentence.
+description that reads as a real sentence. Two optional fields put a second link in the row:
+`docs` for hosted documentation, and `live` for a hosted build of the project itself, which
+renders as `try it`.
 
 ## Tests
 

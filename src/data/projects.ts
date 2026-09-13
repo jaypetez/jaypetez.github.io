@@ -20,11 +20,22 @@ export interface Project {
   readonly repo: string;
   /** Optional hosted documentation, shown as a secondary link. */
   readonly docs?: string;
+  /** Optional hosted build of the thing itself, shown as a "try it" link. */
+  readonly live?: string;
   /** Omitted when zero — an unadorned "0" is noise, not information. */
   readonly stars?: number;
 }
 
 export const projects: readonly Project[] = [
+  {
+    name: 'ideaforge',
+    description:
+      'An interviewer for half-formed ideas. It asks one question at a time until it has the specifics only you know, then writes the LLM prompt you should have given in the first place. Runs in the browser on your own key.',
+    language: 'JavaScript',
+    license: 'MIT',
+    repo: 'https://github.com/jaypetez/ideaforge',
+    live: 'https://jaypetez.github.io/ideaforge/',
+  },
   {
     name: 'glean',
     description:
