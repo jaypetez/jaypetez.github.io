@@ -14,6 +14,7 @@ const render = (project: Project) => container.renderToString(ProjectRow, { prop
 const glean = projects.find((p) => p.name === 'glean')!;
 const agentGpu = projects.find((p) => p.name === 'agent-gpu')!;
 const sidekick = projects.find((p) => p.name === 'sidekick')!;
+const ideaforge = projects.find((p) => p.name === 'ideaforge')!;
 
 describe('ProjectRow', () => {
   it('renders the name, description, and metadata', async () => {
@@ -45,6 +46,13 @@ describe('ProjectRow', () => {
   it('shows a docs link only for projects that publish docs', async () => {
     expect(await render(agentGpu)).toContain(agentGpu.docs!);
     expect(await render(glean)).not.toContain('>Docs<');
+  });
+
+  it('shows a try-it link only for projects with a hosted build', async () => {
+    const html = await render(ideaforge);
+    expect(html).toContain(ideaforge.live!);
+    expect(html).toContain('try it');
+    expect(await render(glean)).not.toContain('try it');
   });
 
   it('renders a heading rather than a bare div, so the page has structure', async () => {

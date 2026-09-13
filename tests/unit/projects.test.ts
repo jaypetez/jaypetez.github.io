@@ -4,6 +4,7 @@ import { LICENSES, projects } from '../../src/data/projects';
 describe('projects data', () => {
   it('lists every public project', () => {
     expect(projects.map((p) => p.name)).toEqual([
+      'ideaforge',
       'glean',
       'ollama-mobile',
       'stride',
@@ -58,6 +59,15 @@ describe('projects data', () => {
     expect(documented.map((p) => p.name)).toEqual(['agent-gpu']);
     for (const project of documented) {
       expect(new URL(project.docs!).protocol).toBe('https:');
+    }
+  });
+
+  it('links a hosted build over https when a project has one', () => {
+    const hosted = projects.filter((p) => p.live !== undefined);
+    // ideaforge runs in the browser, so the repo is not the useful link.
+    expect(hosted.map((p) => p.name)).toEqual(['ideaforge']);
+    for (const project of hosted) {
+      expect(new URL(project.live!).protocol).toBe('https:');
     }
   });
 });
