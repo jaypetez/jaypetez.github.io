@@ -1,10 +1,18 @@
 ---
 /**
  * The site's one ornament: an RFC-style ASCII figure of the stack these
- * repositories implement. Agents on top, agent-gpu as the routing layer,
+ * repositories implement. Four clients on top, agent-gpu as the routing layer,
  * Ollama nodes underneath. It is hand-aligned — edit it with a column ruler,
  * and keep the wide variant under 60 characters and the narrow one under 36
  * (tests/components/stack-figure.test.ts holds both ceilings).
+ *
+ * The wide variant drops four straight arrows into one bar rather than curving
+ * the outer arms inward. A fourth client sits to the right of the old
+ * 25-column box, and an arm reaching back to it would need a leftward corner;
+ * the only glyph for that is an angle bracket, which cannot appear in raw art.
+ * The narrow variant wraps the client list onto two rows with the separators
+ * stacked on the trunk column, which is what holds it at 34 columns and keeps
+ * the font-size clamp below correct.
  *
  * Two variants are swapped with a media query rather than scaled, so the art
  * never shrinks below reading size and never scrolls sideways at 320px.
@@ -12,8 +20,8 @@
  * one out of the accessibility tree.
  */
 const label =
-  'Diagram of the stack: glean, stride, and sidekick send requests to ' +
-  'agent-gpu, which routes them across GPU boxes and a phone running ' +
+  'Diagram of the stack: glean, stride, sidekick, and ideaforge send requests ' +
+  'to agent-gpu, which routes them across GPU boxes and a phone running ' +
   'ollama-mobile.';
 ---
 
@@ -23,27 +31,27 @@ const label =
     role="img"
     aria-label={label}
     is:raw>
-      glean          stride         sidekick
-   (feeds+LLM)     (run coach)     (MCP tools)
-        '--------.      |      .--------'
-                 v      v      v
-           +-------------------------+
-           |        agent-gpu        |
-           |  one API for the fleet  |
-           +-+--------+------+-------+
-             |        |      |
-       .-----'        |      '--------.
-       v              v               v
-  +---------+    +---------+  +---------------+
-  | gpu box |    | gpu box |  |     phone     |
-  | ollama  |    | ollama  |  | ollama-mobile |
-  +---------+    +---------+  +---------------+</pre>
+   glean       stride     sidekick   ideaforge
+(feeds+LLM) (run coach) (MCP tools) (interview)
+     |           |           |           |
+     v           v           v           v
++---------------------------------------------+
+|                  agent-gpu                  |
+|            one API for the fleet            |
++----+--------------+-----------------+-------+
+     |              |                 |
+     v              v                 v
++---------+    +---------+    +---------------+
+| gpu box |    | gpu box |    |     phone     |
+| ollama  |    | ollama  |    | ollama-mobile |
++---------+    +---------+    +---------------+</pre>
   <pre
     class="narrow"
     role="img"
     aria-label={label}
     is:raw>
-    glean . stride . sidekick
+          glean . stride
+       sidekick . ideaforge
                 |
                 v
          +-------------+
