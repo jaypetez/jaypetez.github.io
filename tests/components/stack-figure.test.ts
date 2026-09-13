@@ -53,8 +53,19 @@ describe('StackFigure', () => {
     expect(labels).toHaveLength(2);
     for (const label of labels) {
       expect(label.length).toBeGreaterThan(40);
-      for (const name of ['glean', 'agent-gpu', 'ollama-mobile']) {
+      for (const name of ['glean', 'agent-gpu', 'ideaforge', 'ollama-mobile']) {
         expect(label).toContain(name);
+      }
+    }
+  });
+
+  it('draws every client that routes through agent-gpu', () => {
+    // The art names a deliberate subset of projects, not all of them, so the
+    // cross-check below cannot catch a client being dropped. This can.
+    for (const block of artBlocks(html)) {
+      const art = block.join('\n');
+      for (const name of ['glean', 'stride', 'sidekick', 'ideaforge']) {
+        expect(art, `figure no longer names ${name}`).toContain(name);
       }
     }
   });
