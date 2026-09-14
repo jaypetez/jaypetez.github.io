@@ -1,7 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostMeta from '../../components/PostMeta.astro';
+import PostRow from '../../components/PostRow.astro';
 import { publishedPosts } from '../../lib/posts';
 
 const posts = publishedPosts<CollectionEntry<'blog'>>(
@@ -27,13 +27,7 @@ const posts = publishedPosts<CollectionEntry<'blog'>>(
     ) : (
       <ul class="posts">
         {posts.map((post) => (
-          <li>
-            <h2 class="title">
-              <a href={`/writing/${post.id}/`}>{post.data.title}</a>
-            </h2>
-            <PostMeta pubDate={post.data.pubDate} tags={post.data.tags} />
-            <p class="excerpt">{post.data.description}</p>
-          </li>
+          <PostRow post={post} />
         ))}
       </ul>
     )
@@ -55,35 +49,6 @@ const posts = publishedPosts<CollectionEntry<'blog'>>(
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-
-  .posts > li {
-    padding-block: var(--space-3);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .posts > li:first-child {
-    border-top: 1px solid var(--color-border);
-  }
-
-  .posts h2 {
-    margin-bottom: var(--space-1);
-  }
-
-  .posts h2 a {
-    color: var(--color-fg);
-    text-decoration-color: var(--color-rule);
-  }
-
-  .posts h2 a:hover {
-    color: var(--color-accent);
-    text-decoration-color: currentcolor;
-  }
-
-  .excerpt {
-    max-width: var(--measure);
-    margin-top: var(--space-1);
-    color: var(--color-muted);
   }
 
   .empty {

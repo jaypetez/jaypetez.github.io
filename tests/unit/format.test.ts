@@ -1,5 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, readingTime, slugify, toISODate } from '../../src/lib/format';
+import { formatDate, formatDateShort, readingTime, slugify, toISODate } from '../../src/lib/format';
+
+describe('formatDateShort', () => {
+  it('abbreviates the month to three letters for the ledger gutter', () => {
+    expect(formatDateShort(new Date('2026-07-31T00:00:00Z'))).toBe('31 Jul 2026');
+  });
+
+  it('never exceeds the 11-character gutter, September included', () => {
+    // CLDR gives en-GB "Sept"; the hand-rolled table does not.
+    expect(formatDateShort(new Date('2026-09-13T00:00:00Z'))).toBe('13 Sep 2026');
+    for (let month = 0; month < 12; month++) {
+      expect(formatDateShort(new Date(Date.UTC(2026, month, 28))).length).toBeLessThanOrEqual(11);
+    }
+  });
+
+  it('names the same UTC day as the long form', () => {
+    const late = new Date('2026-01-01T23:30:00Z');
+    expect(formatDateShort(late)).toBe('1 Jan 2026');
+    expect(formatDate(late)).toBe('1 January 2026');
+  });
+
+  it('rejects an invalid date', () => {
+    expect(() => formatDateShort(new Date('not a date'))).toThrow(RangeError);
+  });
+});
 
 describe('formatDate', () => {
   it('spells the month out so the date cannot be misread', () => {

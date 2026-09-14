@@ -227,6 +227,40 @@ describe('internal links and assets all resolve', () => {
   });
 });
 
+describe('essay contents', () => {
+  const postPages = POST_SLUGS.map((slug) => [slug, `writing/${slug}/index.html`] as const);
+
+  it.each(postPages)(
+    '%s: every fragment link resolves to an id on the same page',
+    (_slug, file) => {
+      // The dead-link crawl above only follows site-relative paths; contents
+      // links are fragments, so they need their own check.
+      const html = read(file);
+      const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]!));
+      for (const [, fragment] of html.matchAll(/href="#([^"]+)"/g)) {
+        expect(ids.has(fragment!), `#${fragment} has no target in ${file}`).toBe(true);
+      }
+    },
+  );
+
+  it.each(postPages)(
+    '%s: the contents list mirrors the h2 sections in order, or is absent for a short post',
+    (_slug, file) => {
+      const html = read(file);
+      const sections = [...html.matchAll(/<h2 id="([^"]+)"/g)].map((m) => m[1]!);
+      const nav = html.match(/<nav[^>]*aria-labelledby="contents-label"[^>]*>([\s\S]*?)<\/nav>/);
+
+      if (sections.length < 2) {
+        expect(nav, `${file} has ${sections.length} section(s) but a contents list`).toBeNull();
+        return;
+      }
+      expect(nav, `${file} has ${sections.length} sections but no contents list`).not.toBeNull();
+      const links = [...nav![1]!.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]!);
+      expect(links).toEqual(sections);
+    },
+  );
+});
+
 describe('accessibility (axe-core)', () => {
   it.each(PAGES)(
     '%s has no axe violations',

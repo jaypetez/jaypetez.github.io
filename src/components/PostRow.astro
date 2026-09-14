@@ -1,0 +1,127 @@
+---
+import { formatDateShort, toISODate } from '../lib/format';
+
+/**
+ * One line of the writing ledger, used by the home page and the writing index.
+ *
+ * The date sits in a fixed-width gutter (the `--gutter-date` token, sized for
+ * "31 Jul 2026") so every row's title starts on the same column, the way
+ * `ls -l` pads its columns. Below 40rem the gutter has no room and the date
+ * moves above the title, still on the same left edge.
+ *
+ * The prop is typed structurally rather than as CollectionEntry<'blog'> so the
+ * component can be rendered in tests with a plain object.
+ */
+interface Props {
+  post: {
+    readonly id: string;
+    readonly data: {
+      readonly title: string;
+      readonly description: string;
+      readonly pubDate: Date;
+      readonly tags?: readonly string[];
+    };
+  };
+  /** h2 on the writing index, h3 under the home page's Writing label. */
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { post, headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+
+// Lowercase and deduplicated at render time, as the content schema promises.
+const tags = [...new Set((post.data.tags ?? []).map((tag) => tag.toLowerCase()))];
+---
+
+<li class="row">
+  <time class="mono date" datetime={toISODate(post.data.pubDate)}>
+    {formatDateShort(post.data.pubDate)}
+  </time>
+
+  <div class="entry">
+    <Heading class="title">
+      <a href={`/writing/${post.id}/`}>{post.data.title}</a>
+    </Heading>
+    <p class="excerpt">{post.data.description}</p>
+    {
+      tags.length > 0 && (
+        <p class="mono tags">
+          <span class="visually-hidden">Tagged</span>
+          {tags.map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </p>
+      )
+    }
+  </div>
+</li>
+
+<style>
+  /* A rule between rows, not a box around each. */
+  .row {
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .row:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .date {
+    display: block;
+    margin-bottom: var(--space-1);
+    color: var(--color-muted);
+  }
+
+  /* From 40rem the date takes its gutter and the title starts beside it,
+     aligned on the shared baseline. */
+  @media (min-width: 40rem) {
+    .row {
+      display: grid;
+      grid-template-columns: var(--gutter-date) minmax(0, 1fr);
+      column-gap: var(--space-3);
+      align-items: baseline;
+    }
+
+    .date {
+      margin-bottom: 0;
+    }
+  }
+
+  .title {
+    margin-bottom: var(--space-1);
+    font-size: var(--text-lg);
+  }
+
+  .title a {
+    color: var(--color-fg);
+    text-decoration-color: var(--color-rule);
+  }
+
+  .title a:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentcolor;
+  }
+
+  .excerpt {
+    max-width: var(--measure);
+    color: var(--color-muted);
+  }
+
+  /* Tags are keywords, printed as typed: lowercase, no chip, separated by the
+     same middot the dateline uses. The uppercase of .mono is for labels. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-1);
+    color: var(--color-muted);
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .tag + .tag::before {
+    content: '·' / '';
+    margin-inline-end: var(--space-1);
+  }
+</style>
