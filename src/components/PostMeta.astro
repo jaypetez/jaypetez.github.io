@@ -9,6 +9,9 @@ interface Props {
 }
 
 const { pubDate, updatedDate, minutes, tags = [] } = Astro.props;
+
+// Lowercase and deduplicated at render time, as the content schema promises.
+const keywords = [...new Set(tags.map((tag) => tag.toLowerCase()))];
 ---
 
 <p class="meta mono">
@@ -32,9 +35,12 @@ const { pubDate, updatedDate, minutes, tags = [] } = Astro.props;
     )
   }
   {
-    tags.length > 0 && (
+    keywords.length > 0 && (
       <span class="tags">
-        {tags.map((tag) => (
+        {/* Inside the group, so when the tags wrap to a new line the separator goes with them. */}
+        <span aria-hidden="true">&middot;</span>
+        <span class="visually-hidden">Tagged</span>
+        {keywords.map((tag) => (
           <span class="tag">{tag}</span>
         ))}
       </span>
@@ -48,22 +54,25 @@ const { pubDate, updatedDate, minutes, tags = [] } = Astro.props;
     flex-wrap: wrap;
     gap: var(--space-1);
     align-items: baseline;
-    /* Kept to the prose measure so the tags sit with the text they describe
+    /* Kept to the prose measure so the line sits with the text it describes
        rather than drifting to the far page edge. */
     max-width: var(--measure);
     color: var(--color-muted);
   }
 
+  /* Tags follow the date and reading time as one more item on the line,
+     printed as typed: lowercase keywords, no chip, the same middot between
+     them. The uppercase of .mono is for labels. */
   .tags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1);
-    margin-inline-start: auto;
+    letter-spacing: 0.04em;
+    text-transform: none;
   }
 
-  .tag {
-    padding: 0.1em 0.4em;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-chip);
+  .tag + .tag::before {
+    content: '·' / '';
+    margin-inline-end: var(--space-1);
   }
 </style>

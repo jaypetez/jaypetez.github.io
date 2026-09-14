@@ -23,7 +23,9 @@ interface Props {
 }
 
 const { post } = Astro.props as Props;
-const { Content } = await render(post);
+// `headings` is the list Astro extracted while rendering, with the same slugs
+// it wrote into the h2 ids — the table of contents links to those.
+const { Content, headings } = await render(post);
 
 // Estimated from the raw markdown so fenced code can be discounted.
 const minutes = readingTime(post.body ?? '');
@@ -36,6 +38,7 @@ const minutes = readingTime(post.body ?? '');
   updatedDate={post.data.updatedDate}
   minutes={minutes}
   tags={post.data.tags}
+  headings={headings}
 >
   <Content />
 </PostLayout>

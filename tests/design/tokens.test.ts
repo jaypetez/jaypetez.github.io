@@ -105,6 +105,11 @@ describe('colour contrast is computed, not eyeballed', () => {
     expect(contrast(LIGHT.fg, LIGHT.bg)).toBeGreaterThanOrEqual(7);
     expect(contrast(DARK.fg, DARK.bg)).toBeGreaterThanOrEqual(7);
   });
+
+  it('holds muted text to AAA too — dates, excerpts, and the contents list are read, not glanced at', () => {
+    expect(contrast(LIGHT.muted, LIGHT.bg)).toBeGreaterThanOrEqual(7);
+    expect(contrast(DARK.muted, DARK.bg)).toBeGreaterThanOrEqual(7);
+  });
 });
 
 // -------------------------------------------------------------- anti-slop ---
@@ -116,6 +121,25 @@ describe('anti-slop rules', () => {
         /(linear|radial|conic)-gradient/,
       );
     }
+  });
+
+  it('draws no box-shadow anywhere — depth is not a device a printout has', () => {
+    for (const { file, css } of styles) {
+      expect(stripComments(css), `box-shadow found in ${file}`).not.toMatch(/box-shadow\s*:/);
+    }
+  });
+
+  it('keeps the type scale strictly increasing from xs to 3xl', () => {
+    const steps = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl'].map((step) => {
+      const match = GLOBAL_CSS.match(new RegExp(`--text-${step}:\\s*([\\d.]+)rem`));
+      expect(match, `--text-${step} is not defined in rem`).not.toBeNull();
+      return Number(match![1]);
+    });
+    for (let i = 1; i < steps.length; i++) expect(steps[i]!).toBeGreaterThan(steps[i - 1]!);
+  });
+
+  it('ships a print stylesheet, so the printout prints as paper and ink', () => {
+    expect(GLOBAL_CSS).toContain('@media print');
   });
 
   it('never falls back to Inter or a bare system sans-serif', () => {

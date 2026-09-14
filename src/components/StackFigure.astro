@@ -67,9 +67,11 @@ const label =
 </figure>
 
 <style>
+  /* No block margin of its own: the home page places the figure, beside the
+     name on a wide screen and centred under the lede on a narrow one. */
   figure {
     width: fit-content;
-    margin: var(--space-6) auto 0;
+    margin-inline: auto;
   }
 
   pre {

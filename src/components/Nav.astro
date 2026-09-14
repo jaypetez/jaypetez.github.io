@@ -75,9 +75,16 @@ function isCurrent(href: string): boolean {
   .wordmark {
     color: var(--color-fg);
     font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: var(--text-sm);
+    /* Body size, not label size: it is the one piece of chrome that names the
+       site, and at 17px it still clears a 320px header with room to spare. */
+    font-size: var(--text-base);
     font-weight: 500;
     text-decoration: none;
+    transition: color var(--duration) var(--ease);
+  }
+
+  .wordmark:hover {
+    color: var(--color-accent);
   }
 
   nav {

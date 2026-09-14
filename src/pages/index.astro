@@ -2,7 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectRow from '../components/ProjectRow.astro';
-import PostMeta from '../components/PostMeta.astro';
+import PostRow from '../components/PostRow.astro';
 import StackFigure from '../components/StackFigure.astro';
 import { projects } from '../data/projects';
 import { latest } from '../lib/posts';
@@ -14,12 +14,20 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
   title="Jayson Petersen"
   description="Jayson Petersen builds AI agents, self-hosted LLM tooling, and the infrastructure that runs them. Open source projects and writing."
 >
+  <!--
+    The cover: name and lede on the left, the stack figure on the right from
+    56rem up, so the one ornament sits beside the name it belongs to instead of
+    below it with the right half of the screen empty. Under 56rem the figure
+    drops beneath the lede, centred, as before.
+  -->
   <section class="intro">
-    <h1>Jayson Petersen</h1>
-    <p class="lede">
-      I build agents that do real work, and the infrastructure that keeps them running &mdash;
-      self-hosted, model-agnostic, and open source.
-    </p>
+    <div class="cover">
+      <h1>Jayson Petersen</h1>
+      <p class="lede">
+        I build agents that do real work, and the infrastructure that keeps them running &mdash;
+        self-hosted, model-agnostic, and open source.
+      </p>
+    </div>
     <StackFigure />
   </section>
 
@@ -36,13 +44,7 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
       ) : (
         <ul class="posts">
           {posts.map((post) => (
-            <li>
-              <h3 class="title">
-                <a href={`/writing/${post.id}/`}>{post.data.title}</a>
-              </h3>
-              <PostMeta pubDate={post.data.pubDate} tags={post.data.tags} />
-              <p class="excerpt">{post.data.description}</p>
-            </li>
+            <PostRow post={post} headingLevel="h3" />
           ))}
         </ul>
       )
@@ -53,7 +55,17 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
 
 <style>
   .intro {
+    display: grid;
+    row-gap: var(--space-6);
     padding-block: var(--space-8) var(--space-6);
+  }
+
+  @media (min-width: 56rem) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: var(--space-8);
+      align-items: start;
+    }
   }
 
   /* Fluid between the two scale steps so the name never wraps at 320px. */
@@ -76,36 +88,6 @@ const posts = latest<CollectionEntry<'blog'>>(await getCollection('blog'), 3, im
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-
-  .posts > li {
-    padding-block: var(--space-3);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .posts > li:first-child {
-    border-top: 1px solid var(--color-border);
-  }
-
-  .posts h3 {
-    margin-bottom: var(--space-1);
-    font-size: var(--text-lg);
-  }
-
-  .posts h3 a {
-    color: var(--color-fg);
-    text-decoration-color: var(--color-rule);
-  }
-
-  .posts h3 a:hover {
-    color: var(--color-accent);
-    text-decoration-color: currentcolor;
-  }
-
-  .excerpt {
-    max-width: var(--measure);
-    margin-top: var(--space-1);
-    color: var(--color-muted);
   }
 
   .empty {

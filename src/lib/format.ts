@@ -19,6 +19,36 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
+const SHORT_MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+] as const;
+
+/**
+ * The ledger form of the date, e.g. "31 Jul 2026": at most 11 characters, so it
+ * fits the fixed --gutter-date column on the writing list.
+ *
+ * Spelled by hand rather than through Intl because CLDR gives en-GB "Sept",
+ * which is one character too many and changes between ICU versions. Same UTC
+ * rule as formatDate so both forms always name the same day.
+ */
+export function formatDateShort(date: Date): string {
+  if (Number.isNaN(date.getTime())) {
+    throw new RangeError('formatDateShort received an invalid Date');
+  }
+  return `${date.getUTCDate()} ${SHORT_MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+}
+
 /** ISO-8601 date portion, for `<time datetime>` and RSS. */
 export function toISODate(date: Date): string {
   if (Number.isNaN(date.getTime())) {

@@ -27,14 +27,16 @@ build. They aren't accidents:
 
 | Rule | Where |
 | --- | --- |
-| No gradients of any kind | `tests/design/tokens.test.ts` |
+| No gradients of any kind, no `box-shadow` | `tests/design/tokens.test.ts` |
 | No `Inter`, no bare system-sans stack | same |
 | `border-radius` only from the token set (`0` or `--radius-chip`) | same |
 | `z-index` only from the `--z-*` scale | same |
-| Contrast recomputed from tokens: AA minimum, AAA for body text | same |
-| 8px spacing base unit, prose measure 65–75 characters | same |
+| Contrast recomputed from tokens: AA minimum, AAA for body and muted text | same |
+| 8px spacing base unit, prose measure 65–75 characters, strictly increasing type scale | same |
 | One `h1` per page, skip link before the nav, zero axe violations | `tests/build/output.test.ts` |
-| Every internal link resolves | same |
+| Every internal link resolves, every fragment link has a target | same |
+| An essay's contents list mirrors its `h2` sections, in order | same |
+| Post headings are not numbered by hand (the layout numbers them) | `tests/content/blog-schema.test.ts` |
 
 All design values live in `src/styles/global.css`. If you need a new value, add a token — don't
 hard-code it in a component.

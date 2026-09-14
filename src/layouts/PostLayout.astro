@@ -1,6 +1,8 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import PostMeta from '../components/PostMeta.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 
 interface Props {
   title: string;
@@ -9,9 +11,11 @@ interface Props {
   updatedDate?: Date | undefined;
   minutes: number;
   tags?: readonly string[];
+  /** From render(post); drives the margin table of contents. */
+  headings?: readonly MarkdownHeading[];
 }
 
-const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.props;
+const { title, description, pubDate, updatedDate, minutes, tags = [], headings = [] } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} type="article">
@@ -20,6 +24,16 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
       <h1 class="title">{title}</h1>
       <PostMeta pubDate={pubDate} updatedDate={updatedDate} minutes={minutes} tags={tags} />
     </header>
+
+    <!--
+      The right margin, which is empty on a wide screen and does not exist on a
+      phone. It holds the contents list beside the essay from 64rem up; below
+      that the list is hidden rather than stacked above the text, where it
+      would be a screen of chrome before the first sentence.
+    -->
+    <div class="margin">
+      <TableOfContents headings={headings} />
+    </div>
 
     <div class="prose body">
       <slot />
@@ -42,123 +56,70 @@ const { title, description, pubDate, updatedDate, minutes, tags = [] } = Astro.p
     border-bottom: 1px solid var(--color-rule);
   }
 
+  /* Fluid between the two scale steps: display size on a desktop, one step
+     down on a phone so a two-line title does not become four. */
   header h1 {
     margin-bottom: var(--space-2);
+    font-size: clamp(var(--text-2xl), 1.25rem + 2vw, var(--text-3xl));
   }
 
   .body {
     margin-top: var(--space-4);
+    counter-reset: section;
   }
 
-  /* Prose styling is global rather than scoped because the markdown renderer
-     emits these elements outside this component's scope. */
+  .margin {
+    display: none;
+  }
 
-  /* Section headings inside an essay are mono (the man-page contrast: plain-
-     text structure over typeset prose), one step down from their global size
-     so they label the text rather than shout over it. */
+  @media (min-width: 64rem) {
+    .post {
+      display: grid;
+      grid-template-areas:
+        'header .'
+        'body margin'
+        'footer .';
+      grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
+      column-gap: var(--space-8);
+    }
+
+    header {
+      grid-area: header;
+    }
+
+    .body {
+      grid-area: body;
+    }
+
+    footer {
+      grid-area: footer;
+    }
+
+    /* Placed in the body row only, so it starts level with the first
+       paragraph and stops sticking when the essay ends. */
+    .margin {
+      display: block;
+      grid-area: margin;
+      position: sticky;
+      top: var(--space-6);
+      align-self: start;
+      margin-top: var(--space-4);
+    }
+  }
+
+  /* RFC-style section numbers, from the same count the contents list uses.
+     The empty alternative text keeps screen readers from announcing "1." as
+     part of the heading. Markdown output sits outside this component's
+     scope, hence :global. */
   .body :global(h2) {
-    margin-top: var(--space-6);
-    margin-bottom: var(--space-2);
-    font-size: var(--text-lg);
+    counter-increment: section;
+    /* Room for the header when a contents link jumps here. */
+    scroll-margin-top: var(--space-4);
   }
 
-  .body :global(h3) {
-    margin-top: var(--space-4);
-    margin-bottom: var(--space-1);
-    font-size: var(--text-base);
-  }
-
-  .body :global(p),
-  .body :global(ul),
-  .body :global(ol),
-  .body :global(pre),
-  .body :global(figure),
-  .body :global(blockquote),
-  .body :global(table) {
-    margin-bottom: var(--space-3);
-  }
-
-  .body :global(ul),
-  .body :global(ol) {
-    padding-inline-start: var(--space-3);
-  }
-
-  .body :global(li) {
-    margin-bottom: var(--space-1);
-  }
-
-  .body :global(blockquote) {
-    padding-inline-start: var(--space-2);
-    /* A quiet rule, not the accent — red is reserved for links and focus. */
-    border-inline-start: 2px solid var(--color-rule);
+  .body :global(h2)::before {
+    content: counter(section) '. ' / '';
     color: var(--color-muted);
-    font-style: italic;
-  }
-
-  .body :global(pre) {
-    padding: var(--space-2);
-    overflow-x: auto;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-none);
-    /* Shiki inlines its own theme background; the token wins so code sits on
-       the same platen surface as every other chip on the site. */
-    background: var(--color-surface) !important;
-    font-size: var(--text-sm);
-    line-height: 1.5;
-  }
-
-  /* A figure in a post is ASCII drawing, not code, so it gives up the code
-     block's border and platen and keeps only what holds the art together.
-     Same idiom as StackFigure on the home page; the styles live here because
-     markdown output sits outside any component's scope. */
-  .body :global(figure) {
-    width: fit-content;
-    max-width: 100%;
-    margin-inline: auto;
-  }
-
-  .body :global(figure pre) {
-    padding: 0;
-    border: 0;
-    /* The rule above sets the platen with !important, so this has to answer. */
-    background: none !important;
-    /* Ligatures would fuse the arrows and dashes; alignment dies with them. */
-    font-variant-ligatures: none;
-    /* Post figures are capped at 44 columns (tests/content/post-figures.test.ts).
-       At half an em per character that fits a 320px viewport without ever
-       scaling below reading size, so the art never scrolls sideways. */
-    font-size: clamp(0.6875rem, calc((100vw - 3rem) / 22), var(--text-sm));
-    line-height: 1.3;
-    color: var(--color-muted);
-  }
-
-  .body :global(figcaption) {
-    margin-top: var(--space-2);
-    color: var(--color-muted);
-    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: var(--text-xs);
-    text-align: center;
-  }
-
-  .body :global(hr) {
-    margin-block: var(--space-6);
-    border: 0;
-    border-top: 1px solid var(--color-rule);
-  }
-
-  /* Wide tables scroll inside their own container; the page never does. */
-  .body :global(table) {
-    display: block;
-    overflow-x: auto;
-    border-collapse: collapse;
-    font-size: var(--text-sm);
-  }
-
-  .body :global(th),
-  .body :global(td) {
-    padding: var(--space-1);
-    border-bottom: 1px solid var(--color-border);
-    text-align: start;
   }
 
   footer {

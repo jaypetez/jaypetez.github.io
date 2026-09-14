@@ -15,7 +15,16 @@ The reference points are plain-text engineering artifacts: RFC figures, `ls -l` 
 the man page. One rule holds it together — structure (names, labels, dates, navigation) is
 monospace, prose is serif — and one ornament spends the whole decoration budget: the hand-aligned
 ASCII diagram of the stack on the home page, which is also a map of the projects listed under it.
-The palette is a two-colour printer ribbon: ink on paper, with the red band as the single accent.
+The palette is a two-colour printer ribbon: ink on paper, with the red band as the single accent;
+links in running text are ink with a red hairline under them, so a paragraph of citations reads as
+text first.
+
+The layout is a ledger, not a grid of cards. Dates sit in a fixed-width gutter so every title starts
+on the same column, and on a wide screen the right margin does work instead of sitting empty: the
+stack figure sits beside the name on the home page, and each essay gets a numbered table of contents
+that sticks beside the text (its numbers and the section numbers come from the same CSS counter, so
+they cannot disagree). On a phone all of it stacks back into one column. None of this needs
+JavaScript.
 
 The faces are Iosevka (vendored and subset by hand in `src/assets/fonts`, ~16 KB a weight) and
 Source Serif 4. No CSS framework, no icon font, no fake terminal effects — no blinking cursor, no
@@ -25,8 +34,9 @@ Generic AI-generated sites converge on the same handful of choices — Inter, a 
 gradient, a grid of identically rounded cards — and `tests/design/tokens.test.ts` fails the build
 if any of them come back. `tests/components/stack-figure.test.ts` does the same for the diagram:
 width ceilings per variant, pure printable ASCII, `role="img"` with a label that says what it
-shows. Every design value lives in `src/styles/global.css` as a token — components never
-hard-code them.
+shows. `tests/build/output.test.ts` checks that every essay's contents list mirrors its `h2`
+sections in order and that every fragment link has a target. Every design value lives in
+`src/styles/global.css` as a token — components never hard-code them.
 
 ## Local development
 

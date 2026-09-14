@@ -9,6 +9,20 @@
  * is monospace; everything that is prose is serif — typeset text under
  * plain-text chrome. There are deliberately no gradients, no decorative
  * shadows, no rounded cards, and no fake terminal effects.
+ *
+ * Layout follows the same reference: a ledger, not a grid of cards. Dates sit
+ * in a fixed-width gutter the way `ls -l` pads its columns, and on a wide
+ * screen the right margin does work — the stack figure beside the name on the
+ * home page, a numbered table of contents beside an essay — rather than sitting
+ * empty. On a phone all of it stacks back into one column.
+ *
+ * Breakpoints, written down once because media queries cannot read tokens:
+ *   24rem  project-row metadata drops to a second line
+ *   26rem  page padding tightens one step
+ *   30rem  the wide stack figure replaces the narrow one
+ *   40rem  post rows gain the date gutter
+ *   56rem  home hero goes two-column (name and lede left, figure right)
+ *   64rem  essays gain the sticky margin table of contents
  */
 
 :root {
@@ -37,6 +51,10 @@
   --measure: 68ch;
   --page-max: 60rem;
 
+  /* The date column of the writing ledger: "31 Jul 2026" is 11 characters,
+     and every date the short formatter produces fits inside it. */
+  --gutter-date: 11ch;
+
   /* ---- Radius: structural elements are square. ---- */
   --radius-none: 0;
   --radius-chip: 2px;
@@ -58,7 +76,7 @@
    */
   --color-bg: #f4f4f1; /* paper — neutral grey-white, not cream */
   --color-fg: #20201d; /* ink — 14.7:1 on bg */
-  --color-muted: #57554f; /* graphite — 6.5:1 on bg */
+  --color-muted: #52504a; /* graphite — 7.3:1 on bg, AAA like the body text */
   --color-border: #dcdad4; /* hairline */
   --color-rule: #c9c6bd; /* hairline, drawn heavier */
   --color-accent: #b42318; /* ribbon red — 6.0:1 on bg */
@@ -74,11 +92,11 @@
   :root:not([data-theme='light']) {
     --color-bg: #151412; /* paper, unlit */
     --color-fg: #e8e6df; /* ink, reversed — 13.9:1 on bg */
-    --color-muted: #a5a29a; /* graphite — 7.0:1 on bg */
+    --color-muted: #a5a29a; /* graphite — 7.3:1 on bg */
     --color-border: #2c2a27; /* hairline */
     --color-rule: #3b3833; /* hairline, drawn heavier */
     --color-accent: #ff6f61; /* ribbon red, lifted — 6.6:1 on bg */
-    --color-surface: #1e1d1a; /* platen */
+    --color-surface: #211f1b; /* platen — one step off the paper, so code reads as a surface */
     --color-selection: #4a221d;
 
     color-scheme: dark;
@@ -92,7 +110,7 @@
   --color-border: #2c2a27;
   --color-rule: #3b3833;
   --color-accent: #ff6f61;
-  --color-surface: #1e1d1a;
+  --color-surface: #211f1b;
   --color-selection: #4a221d;
 
   color-scheme: dark;
@@ -131,6 +149,11 @@ html {
 }
 
 body {
+  /* A column the height of the viewport, so the footer rule sits at the bottom
+     of a short page (About, 404) instead of floating mid-screen. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
@@ -143,8 +166,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+main {
+  flex: 1 0 auto;
+  /* Explicit, because a flex item with auto inline margins is otherwise sized
+     to its content, which would shrink-wrap and re-centre a short page. */
+  width: 100%;
+}
+
 ::selection {
   background: var(--color-selection);
+  /* Pinned, so selected text never keeps a muted or accent colour that
+     fails against the selection tint. */
+  color: var(--color-fg);
 }
 
 img,
@@ -171,8 +204,10 @@ h4 {
   text-wrap: balance;
 }
 
+/* Page titles are labels, one step below display size; the home page and
+   essay titles opt up to a fluid size of their own. */
 h1 {
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
 }
 h2 {
   font-size: var(--text-xl);
@@ -286,10 +321,6 @@ pre {
   }
 }
 
-.prose {
-  max-width: var(--measure);
-}
-
 /* Visible only to assistive technology, until focused. */
 .visually-hidden {
   position: absolute;
@@ -334,4 +365,202 @@ pre {
   height: 1px;
   background: var(--color-rule);
   content: '';
+}
+
+/* ----------------------------------------------------------------- prose ---- */
+
+/*
+ * Typeset running text: essays and the About page. These rules are global
+ * rather than scoped because the markdown renderer emits the elements outside
+ * any component's scope, and so that every page that carries prose gets the
+ * same rhythm from one place.
+ */
+.prose {
+  max-width: var(--measure);
+}
+
+/* Section headings inside prose are mono (the man-page contrast: plain-text
+   structure over typeset text), one step down from their global size so they
+   label the text rather than shout over it. */
+.prose h2 {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.prose h3 {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-1);
+  font-size: var(--text-base);
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose pre,
+.prose figure,
+.prose blockquote,
+.prose table {
+  margin-bottom: var(--space-3);
+}
+
+/* Links in running text are ink with a red hairline under them, so a dense
+   paragraph of citations reads as text first. The red fills in on hover and
+   on keyboard focus. Chrome links (nav, footer, "all writing") keep the
+   global accent colour; they are labels, not sentences. */
+.prose a {
+  color: var(--color-fg);
+  text-decoration-color: var(--color-accent);
+  transition: color var(--duration) var(--ease);
+}
+
+.prose a:hover,
+.prose a:focus-visible {
+  color: var(--color-accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: var(--space-3);
+}
+
+/* Bullets are the plain-text dash, drawn in the mono face like every other
+   piece of structure; numbered lists keep their digits but take the face. */
+.prose ul {
+  list-style-type: '- ';
+}
+
+.prose li::marker {
+  color: var(--color-muted);
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.prose li {
+  margin-bottom: var(--space-1);
+}
+
+.prose blockquote {
+  padding-inline-start: var(--space-2);
+  /* A quiet rule, not the accent — red is reserved for links and focus. */
+  border-inline-start: 2px solid var(--color-rule);
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.prose pre {
+  padding: var(--space-2);
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-none);
+  /* Shiki inlines its own theme background; the token wins so code sits on
+     the same platen surface as every other chip on the site. */
+  background: var(--color-surface) !important;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  tab-size: 2;
+  /* Ligatures would fuse the arrows and operators the code depends on. */
+  font-variant-ligatures: none;
+}
+
+/* A figure in a post is ASCII drawing, not code, so it gives up the code
+   block's border and platen and keeps only what holds the art together.
+   Same idiom as StackFigure on the home page. */
+.prose figure {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.prose figure pre {
+  padding: 0;
+  border: 0;
+  /* The rule above sets the platen with !important, so this has to answer. */
+  background: none !important;
+  /* Post figures are capped at 44 columns (tests/content/post-figures.test.ts).
+     At half an em per character that fits a 320px viewport without ever
+     scaling below reading size, so the art never scrolls sideways. */
+  font-size: clamp(0.6875rem, calc((100vw - 3rem) / 22), var(--text-sm));
+  line-height: 1.3;
+  color: var(--color-muted);
+}
+
+.prose figcaption {
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.prose hr {
+  margin-block: var(--space-6);
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+}
+
+/* Wide tables scroll inside their own container; the page never does. */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.prose th,
+.prose td {
+  padding: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  text-align: start;
+}
+
+.prose th {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 500;
+}
+
+/* ----------------------------------------------------------------- print ---- */
+
+/*
+ * The printout prints. Paper and ink regardless of the screen theme, the
+ * interface chrome dropped, and the address of every outbound link set after
+ * it in mono so a citation survives the trip to paper.
+ */
+@media print {
+  :root,
+  :root[data-theme='dark'] {
+    --color-bg: #ffffff;
+    --color-fg: #000000;
+    --color-muted: #444444;
+    --color-border: #bbbbbb;
+    --color-rule: #999999;
+    --color-accent: #000000;
+    --color-surface: #f2f2f2;
+
+    color-scheme: light;
+  }
+
+  .skip-link,
+  .site-header nav,
+  #theme-toggle,
+  .contents {
+    display: none;
+  }
+
+  .prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: var(--text-xs);
+    word-break: break-all;
+  }
+
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  pre,
+  figure,
+  blockquote {
+    break-inside: avoid;
+  }
 }

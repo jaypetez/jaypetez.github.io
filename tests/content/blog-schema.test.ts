@@ -86,4 +86,13 @@ describe('blog content', () => {
       expect(post.body.trim().length).toBeGreaterThan(400);
     },
   );
+
+  it.each(posts.map((p) => [p.file, p] as const))(
+    '%s does not number its sections by hand, since the layout numbers them',
+    (_file, post) => {
+      for (const heading of post.body.matchAll(/^##\s+(.+)$/gm)) {
+        expect(heading[1], `hand-numbered heading: ${heading[1]}`).not.toMatch(/^\d+[.)]\s/);
+      }
+    },
+  );
 });

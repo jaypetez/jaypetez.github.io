@@ -1,0 +1,85 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+/**
+ * The numbered contents of an essay, built from the headings Astro extracts at
+ * render time. Only h2 sections are listed: the posts do not nest, and a
+ * contents list that mirrors the reader's actual stops is the useful one.
+ *
+ * Renders nothing for a post with fewer than two sections — a table of
+ * contents with one entry is a heading repeated. The numbers come from a CSS
+ * counter, so they always agree with the counter that numbers the h2s in
+ * PostLayout; both count the same elements in the same order.
+ *
+ * Zero JavaScript: it is a list of fragment links. PostLayout decides where it
+ * sits (the right margin on wide viewports) and when it is hidden.
+ */
+interface Props {
+  headings: readonly MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const sections = headings.filter((heading) => heading.depth === 2);
+---
+
+{
+  sections.length >= 2 && (
+    <nav class="contents" aria-labelledby="contents-label">
+      <p class="section-label mono" id="contents-label">
+        Contents
+      </p>
+      <ol>
+        {sections.map((section) => (
+          <li>
+            <a href={`#${section.slug}`}>{section.text}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<style>
+  .contents {
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: var(--text-sm);
+    line-height: 1.4;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: contents;
+  }
+
+  /* Number in a 3ch column, text beside it, so wrapped titles hang under
+     their own first line rather than under the number. */
+  li {
+    display: grid;
+    grid-template-columns: 3ch minmax(0, 1fr);
+    column-gap: 1ch;
+    margin-bottom: var(--space-1);
+    counter-increment: contents;
+  }
+
+  li::before {
+    content: counter(contents) '.' / '';
+    color: var(--color-muted);
+    text-align: end;
+  }
+
+  a {
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color var(--duration) var(--ease);
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--color-fg);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+  }
+</style>
