@@ -39,7 +39,7 @@ frontier. It changes which answer is the lazy one.
   | stays home    | | tokens leave  |
   +---------------+ +---------------+
 </pre>
-<figcaption>fig 1 &middot; the only routing rule I actually follow</figcaption>
+<figcaption>The only routing rule I actually follow</figcaption>
 </figure>
 
 ## What actually leaves the house
@@ -57,6 +57,13 @@ with retention stretching from thirty days to five years when you do.
 Commercial and API customers were untouched. Whatever you make of the change
 itself, notice that it landed on accounts opened years earlier: the thing you
 agreed to in 2023 was not the thing you were running under in 2026.
+
+<aside class="pull" aria-hidden="true">
+
+Your delete button was never the binding constraint. Someone else's
+discovery dispute was.
+
+</aside>
 
 Litigation moves faster than policy. During the New York Times case OpenAI was
 ordered to [preserve output log
@@ -103,7 +110,7 @@ is, and the index is the thing you would least want to hand over.
   :      local model answers it     :
   :.................................:
 </pre>
-<figcaption>fig 2 &middot; retrieval, with nothing crossing the line</figcaption>
+<figcaption>Retrieval, with nothing crossing the line</figcaption>
 </figure>
 
 Coding is where the split is sharpest, and I have landed somewhere
@@ -149,7 +156,7 @@ notice far less than the parameter count I can now afford.
   24 GB   27B, 32B dense     daily driver
   48 GB   70B, big context   few limits
 </pre>
-<figcaption>fig 3 &middot; the ladder, and where it stops hurting</figcaption>
+<figcaption>The ladder, and where it stops hurting</figcaption>
 </figure>
 
 The other number is memory bandwidth, which sets how fast tokens come out
@@ -188,7 +195,7 @@ something a household can share.
                  |
      LAN only, nothing exposed
 </pre>
-<figcaption>fig 4 &middot; the whole thing, physically</figcaption>
+<figcaption>The whole thing, physically</figcaption>
 </figure>
 
 The cost that caught me out is that the box is on all the time. Idle draw on a

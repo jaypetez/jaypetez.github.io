@@ -118,6 +118,13 @@ I'm honestly not certain the last one belongs; with enough prompt discipline
 you can fake per-branch verifiers inside a single loop, and I've done it. The
 other three I'd defend.
 
+<aside class="pull" aria-hidden="true">
+
+The test I've settled on isn't "is this complicated?", since complicated
+tasks are what loops are for.
+
+</aside>
+
 The third is the one I'd underline. There's a real difference between
 `if state["risk_level"] == "high": return "human_review"` and a system prompt
 politely requesting escalation on risky actions. The first is enforced. The
