@@ -84,7 +84,7 @@ Figures are raw HTML in the markdown, and `tests/content/post-figures.test.ts` i
 <pre role="img" aria-label="A sentence describing the diagram for a screen reader.">
   drawing goes here
 </pre>
-<figcaption>fig 1 &middot; what it shows</figcaption>
+<figcaption>What it shows</figcaption>
 </figure>
 ```
 
@@ -95,7 +95,41 @@ Figures are raw HTML in the markdown, and `tests/content/post-figures.test.ts` i
 - No trailing whitespace on any art line.
 - Counts of `<figure>`, `<figcaption>`, and `<pre role="img">` must match, and no bare `<pre>` may
   appear outside a figure.
-- Use HTML entities in captions (`&middot;`, `&mdash;`), not literal Unicode.
+- The caption says what the drawing shows, in sentence case, with no number: the layout prints
+  "Figure 1." in front of it, counting figures the way it counts sections. A content test refuses
+  `fig 1`, and refuses a middle dot.
+- Use HTML entities in captions (`&mdash;`, `&rsquo;`), not literal Unicode.
+
+## 5a. A pull quote and margin notes, if they earn it
+
+Two devices give a long essay somewhere for the eye to land. Neither is required, and both are
+budgeted. `tests/content/post-devices.test.ts` enforces the rules marked as tested.
+
+**One pull quote at most** (tested): the essay's sharpest sentence, repeated at display size. It
+must be **lifted verbatim** from the text (tested, after removing link syntax and joining the
+hard-wrapped lines), carry `aria-hidden="true"` because a screen reader has already heard it
+(tested), and contain no link (tested). Put it one or two paragraphs after its source, never
+right before a heading or beside a figure. Keep the blank lines inside the tags, or the sentence
+is not parsed as markdown:
+
+```html
+<aside class="pull" aria-hidden="true">
+
+The sentence, exactly as it appears above.
+
+</aside>
+```
+
+**Up to three margin notes** (tested): an aside that the sentence reads perfectly well without.
+Write it where the parenthetical would go, but as a span with no brackets and **no space before
+it** (both tested). The layout adds the brackets back on a narrow screen and floats the note into
+the right margin on a wide one, where the sentence closes up around it:
+
+```html
+the second card<span class="note">a used 3090 is still the cheapest 24 GB</span> pays for itself.
+```
+
+Never two notes in the same or adjacent paragraphs; they stack in the margin and collide.
 
 ## 6. Verify
 

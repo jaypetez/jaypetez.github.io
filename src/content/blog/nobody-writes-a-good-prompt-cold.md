@@ -84,7 +84,7 @@ verbatim quote from you supporting it.
           v                     v
      up one level         nothing moves
 </pre>
-<figcaption>fig 1 &middot; the only claim the interview trusts</figcaption>
+<figcaption>The only claim the interview trusts</figcaption>
 </figure>
 
 Around that sits a ratchet. Coverage never falls, it rises at most one level

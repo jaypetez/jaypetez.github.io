@@ -14,9 +14,9 @@
 
 /* RFC-style section numbers, from the same count the contents list uses.
    The empty alternative text keeps screen readers from announcing "1." as
-   part of the heading. */
+   part of the heading. Figures keep a count of their own. */
 .essay-body {
-  counter-reset: section;
+  counter-reset: section figure;
 }
 
 .essay-body h2 {
@@ -45,6 +45,21 @@
   }
 }
 
+/* ----------------------------------------------------------- figures ---- */
+
+/* Figures are numbered by the layout, like sections, so a caption is only
+   ever what the drawing shows (tests/content refuses a hand-numbered one).
+   The number is read aloud: "Figure 2" is how the text would refer to it. */
+.essay-body figure {
+  counter-increment: figure;
+}
+
+.essay-body figcaption::before {
+  color: var(--color-fg);
+  font-weight: 600;
+  content: 'Figure ' counter(figure) '. ';
+}
+
 /* -------------------------------------------------------------- code ---- */
 
 /* Code says what language it is, in the corner, on the platen. Shiki puts the
@@ -68,18 +83,21 @@
 /* --------------------------------------------------- notes and quotes ---- */
 
 /*
- * A margin note is an aside written inline, inside its paragraph:
- *   <span class="note">which is cheaper than it sounds</span>
- * Narrow, it reads in place as the parenthetical it was, in graphite. From
- * 80rem it floats out into the right margin beside the line it belongs to, in
- * the interface face, and the sentence closes up around it.
+ * A margin note is an aside written inline, inside its paragraph, attached to
+ * the word before it with no space:
+ *   the second card<span class="note">which is cheaper than it sounds</span> is
+ * Narrow, it reads in place as the parenthetical it was, in graphite: the
+ * opening bracket brings its own space. From 80rem it floats out into the
+ * right margin beside the line it belongs to, in the interface face, and the
+ * sentence closes up around it with no stray space before the next word or
+ * full stop.
  */
 .note {
   color: var(--color-muted);
 }
 
 .note::before {
-  content: '(' / '';
+  content: ' (' / '';
 }
 
 .note::after {
@@ -184,7 +202,7 @@
   }
 
   .note::before {
-    content: '(' / '';
+    content: ' (' / '';
   }
 
   .note::after {
