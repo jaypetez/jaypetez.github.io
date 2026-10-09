@@ -43,16 +43,14 @@ const tags = [...new Set((post.data.tags ?? []).map((tag) => tag.toLowerCase()))
       <a href={`/writing/${post.id}/`}>{post.data.title}</a>
     </Heading>
     <p class="excerpt">{post.data.description}</p>
-    {
-      tags.length > 0 && (
-        <p class="mono tags">
-          <span class="visually-hidden">Tagged</span>
-          {tags.map((tag) => (
-            <span class="tag">{tag}</span>
-          ))}
-        </p>
-      )
-    }
+    {tags.length > 0 && (
+      <p class="mono tags">
+        <span class="visually-hidden">Tagged</span>
+        {tags.map((tag) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </p>
+    )}
   </div>
 </li>
 
