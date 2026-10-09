@@ -115,15 +115,17 @@
   padding-top: var(--space-2);
   border-top: 1px solid var(--color-rule);
   color: var(--color-fg);
-  font-family: var(--face-serif);
+  /* The italic serif, at reading weight: large enough to land on, and never
+     mistaken for a section heading, which is the upright sans. */
+  font-family: var(--face-serif-italic);
   font-size: var(--text-2xl);
-  font-weight: 600;
-  line-height: var(--leading-tight);
-  letter-spacing: -0.01em;
+  font-style: italic;
+  font-weight: 400;
+  line-height: var(--leading-snug);
   text-wrap: balance;
 }
 
-.pull p {
+.essay-body .pull p {
   margin: 0;
 }
 

@@ -129,6 +129,13 @@ the model yourself](/writing/run-your-own-model/) and I'd rather say so than
 dress it up. There are no dependencies, so there's no build step and nothing
 in the supply chain to trust.
 
+<aside class="pull" aria-hidden="true">
+
+The chat is a good place to find out what the work is and the worst place to
+do it.
+
+</aside>
+
 What I'm least sure about is durability. Models are getting better at asking
 unprompted, and a frontier model told to interview you does a respectable job
 today. If that keeps improving, the interviewing is a feature of the model

@@ -58,6 +58,13 @@ Commercial and API customers were untouched. Whatever you make of the change
 itself, notice that it landed on accounts opened years earlier: the thing you
 agreed to in 2023 was not the thing you were running under in 2026.
 
+<aside class="pull" aria-hidden="true">
+
+Your delete button was never the binding constraint. Someone else's
+discovery dispute was.
+
+</aside>
+
 Litigation moves faster than policy. During the New York Times case OpenAI was
 ordered to [preserve output log
 data](https://openai.com/index/response-to-nyt-data-demands/) that its own
