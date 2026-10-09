@@ -1,0 +1,71 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { publishedPosts, topicsWithCounts } from '../../../lib/posts';
+
+const posts = publishedPosts<CollectionEntry<'blog'>>(
+  await getCollection('blog'),
+  import.meta.env.DEV,
+);
+// Busiest first, then alphabetical — see topicsWithCounts.
+const topics = topicsWithCounts(posts);
+---
+
+<BaseLayout
+  title="Topics"
+  description="Every topic Jayson Petersen's essays cover, with how many essays are filed under each one."
+>
+  <div class="head">
+    <h1>Topics</h1>
+    <p class="lede serif">
+      Every tag on the essays, most-used first. <a href="/writing/">All writing</a> has them in date
+      order.
+    </p>
+  </div>
+
+  <ul class="topics">
+    {topics.map((topic) => (
+      <li>
+        <a href={`/writing/topics/${topic.name}/`}>{topic.name}</a>
+        <span class="label">{topic.count === 1 ? '1 essay' : `${topic.count} essays`}</span>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
+
+<style>
+  .head {
+    padding-block: var(--space-8) var(--space-4);
+  }
+
+  .lede {
+    max-width: var(--measure);
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+  }
+
+  /* A ledger poured into columns: each topic on its own ruled line, the count
+     at the far end, so a long tail of one-essay topics stays scannable. */
+  .topics {
+    columns: 15rem auto;
+    column-gap: var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+    break-inside: avoid;
+  }
+
+  li a {
+    font-weight: 500;
+  }
+</style>

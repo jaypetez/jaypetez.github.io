@@ -18,14 +18,32 @@ const BLOG_DIR = join(process.cwd(), 'src/content/blog');
  * adding, renaming, or removing a post needs no edit here. Drafts are excluded
  * because the build excludes them.
  */
-const POST_SLUGS: string[] = readdirSync(BLOG_DIR)
+const PUBLISHED_FILES: string[] = readdirSync(BLOG_DIR)
   .filter((file) => /\.mdx?$/.test(file))
-  .filter((file) => !/^draft:\s*true$/m.test(readFileSync(join(BLOG_DIR, file), 'utf8')))
-  .map((file) => file.replace(/\.mdx?$/, ''));
+  .filter((file) => !/^draft:\s*true$/m.test(readFileSync(join(BLOG_DIR, file), 'utf8')));
+
+const POST_SLUGS: string[] = PUBLISHED_FILES.map((file) => file.replace(/\.mdx?$/, ''));
+
+/**
+ * Every topic on a published post, read from the frontmatter the same way, so
+ * a new tag adds its page to every assertion below without an edit here. The
+ * schema requires slug-shaped tags, so a tag is its own URL segment.
+ */
+const TOPICS: string[] = [
+  ...new Set(
+    PUBLISHED_FILES.flatMap((file) => {
+      const line = readFileSync(join(BLOG_DIR, file), 'utf8').match(/^tags:\s*\[(.*)\]\s*$/m);
+      return line
+        ? [...line[1]!.matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]!.toLowerCase())
+        : [];
+    }),
+  ),
+].sort();
 
 const STATIC_PAGES: readonly (readonly [string, string])[] = [
   ['home', 'index.html'],
   ['writing index', 'writing/index.html'],
+  ['topics index', 'writing/topics/index.html'],
   ['about', 'about/index.html'],
   ['404', '404.html'],
 ];
@@ -33,6 +51,7 @@ const STATIC_PAGES: readonly (readonly [string, string])[] = [
 const PAGES: readonly (readonly [string, string])[] = [
   ...STATIC_PAGES,
   ...POST_SLUGS.map((slug) => [`post: ${slug}`, `writing/${slug}/index.html`] as const),
+  ...TOPICS.map((topic) => [`topic: ${topic}`, `writing/topics/${topic}/index.html`] as const),
 ];
 
 beforeAll(() => {
@@ -77,10 +96,12 @@ describe('build output', () => {
     expect(existsSync(join(DIST, 'sitemap-index.xml'))).toBe(true);
   });
 
-  it('found posts to assert against', () => {
-    // Guards the derived-slug approach: an empty content dir would silently
-    // turn several assertions below into no-ops.
+  it('found posts and topics to assert against', () => {
+    // Guards the derived-slug approach: an empty content dir, or a frontmatter
+    // format the tag reader no longer understands, would silently turn several
+    // assertions below into no-ops.
     expect(POST_SLUGS.length).toBeGreaterThan(0);
+    expect(TOPICS.length).toBeGreaterThan(0);
   });
 
   it('lists every published post in the RSS feed with an absolute link', () => {
@@ -93,7 +114,14 @@ describe('build output', () => {
 
   it('lists every page in the sitemap', () => {
     const sitemap = read('sitemap-0.xml');
-    const paths = ['', 'about/', 'writing/', ...POST_SLUGS.map((slug) => `writing/${slug}/`)];
+    const paths = [
+      '',
+      'about/',
+      'writing/',
+      'writing/topics/',
+      ...POST_SLUGS.map((slug) => `writing/${slug}/`),
+      ...TOPICS.map((topic) => `writing/topics/${topic}/`),
+    ];
     for (const path of paths) {
       expect(sitemap).toContain(`https://jaypetez.github.io/${path}`);
     }

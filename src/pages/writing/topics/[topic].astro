@@ -1,0 +1,112 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostRow from '../../../components/PostRow.astro';
+import {
+  postsByTopic,
+  publishedPosts,
+  relatedTopics,
+  topicsWithCounts,
+  type Topic,
+} from '../../../lib/posts';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = publishedPosts<CollectionEntry<'blog'>>(
+    await getCollection('blog'),
+    import.meta.env.DEV,
+  );
+  // The schema requires slug-shaped tags, so each tag is its own URL segment.
+  return topicsWithCounts(posts).map((topic) => ({
+    params: { topic: topic.name },
+    props: {
+      topic,
+      posts: postsByTopic(posts, topic.name),
+      nearby: relatedTopics(posts, topic.name),
+    },
+  }));
+};
+
+interface Props {
+  topic: Topic;
+  posts: CollectionEntry<'blog'>[];
+  /** Topics that share an essay with this one: somewhere to go from a short page. */
+  nearby: Topic[];
+}
+
+const { topic, posts, nearby } = Astro.props as Props;
+const count = topic.count === 1 ? 'One essay' : `${topic.count} essays`;
+---
+
+<BaseLayout
+  title={`Writing on ${topic.name}`}
+  description={`Essays by Jayson Petersen filed under ${topic.name}: ${topic.count === 1 ? 'one so far' : `${topic.count} so far`}.`}
+>
+  <div class="head">
+    <h1>{topic.name}</h1>
+    <p class="lede serif">
+      {count} filed under this topic. <a href="/writing/topics/">All topics</a>
+    </p>
+  </div>
+
+  <ul class="posts">
+    {posts.map((post) => (
+      <PostRow post={post} />
+    ))}
+  </ul>
+
+  {nearby.length > 0 && (
+    <section class="nearby" aria-labelledby="nearby">
+      <h2 class="label" id="nearby">
+        Nearby topics
+      </h2>
+      <ul>
+        {nearby.map((t) => (
+          <li>
+            <a href={`/writing/topics/${t.name}/`}>{t.name}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .head {
+    padding-block: var(--space-8) var(--space-4);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+  }
+
+  .lede {
+    max-width: var(--measure);
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+  }
+
+  .posts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nearby {
+    margin-top: var(--space-6);
+  }
+
+  .nearby h2 {
+    margin-bottom: var(--space-1);
+  }
+
+  .nearby ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>
