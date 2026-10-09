@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LICENSES, projects } from '../../src/data/projects';
+import { LICENSES, projects, STATUSES } from '../../src/data/projects';
 
 describe('projects data', () => {
   it('lists every public project', () => {
@@ -22,6 +22,7 @@ describe('projects data', () => {
     expect(project.name).toMatch(/^[a-z0-9-]+$/);
     expect(project.language.length).toBeGreaterThan(0);
     expect(LICENSES).toContain(project.license);
+    expect(STATUSES).toContain(project.status);
   });
 
   it.each(projects.map((p) => [p.name, p] as const))(

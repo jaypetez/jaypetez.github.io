@@ -50,7 +50,7 @@ const fullTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
       serif, one variable file each. The mono (code and figures only) and the
       italic serif (posts only) are declared but load when a page uses them.
     -->
-    <Font cssVariable="--font-sans" preload={[{ weight: 400, subset: 'latin' }]} />
+    <Font cssVariable="--font-sans" preload={[{ weight: 400 }]} />
     <Font cssVariable="--font-serif" preload={[{ weight: 400, subset: 'latin' }]} />
     <Font cssVariable="--font-mono" />
     <Font cssVariable="--font-serif-italic" />

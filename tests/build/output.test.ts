@@ -236,6 +236,20 @@ describe('internal links and assets all resolve', () => {
     expect(dead, `dead internal links in ${page}: ${dead.join(', ')}`).toEqual([]);
   });
 
+  it.each(pages.map((p) => [p] as const))(
+    '%s: every fragment link lands on an id on the same page',
+    (page) => {
+      // The crawl above only follows site-relative paths. Fragments matter on
+      // every page now: the stack map's boxes jump to #project-* rows, and an
+      // essay's contents list jumps to its sections.
+      const html = read(page);
+      const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]!));
+      for (const [, fragment] of html.matchAll(/href="#([^"]+)"/g)) {
+        expect(ids.has(fragment!), `#${fragment} has no target in ${page}`).toBe(true);
+      }
+    },
+  );
+
   it('every page is reachable from the navigation', () => {
     const home = read('index.html');
     for (const route of ['/', '/writing/', '/about/']) {

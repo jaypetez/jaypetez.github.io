@@ -293,7 +293,7 @@ pre {
    text, excerpts, project descriptions, standfirsts. */
 .serif {
   font-family: var(--face-serif);
-  font-variant-numeric: oldstyle-nums proportional-nums;
+  font-variant-numeric: proportional-nums;
 }
 
 .serif em,

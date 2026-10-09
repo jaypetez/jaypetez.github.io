@@ -25,15 +25,28 @@ export default defineConfig({
     {
       // The interface face: navigation, headings, labels, the stack map.
       // Designed by the Braille Institute for legibility first, which is the
-      // same priority the AAA contrast rule sets for the palette. One variable
-      // file covers every weight in the range (~34 KB, Latin only).
-      provider: fontProviders.google(),
+      // same priority the AAA contrast rule sets for the palette.
+      //
+      // Vendored rather than fetched: Google's Latin file is variable from 200
+      // to 800 (34 KB), and the site only sets 400 to 700. Clamping the weight
+      // axis to that range with fontTools' instancer cuts it to 21 KB, which
+      // comes straight off every page's critical path. Regenerate from the
+      // upstream Latin file with:
+      //   fonttools varLib.instancer <in>.woff2 wght=400:700 --flavor=woff2
+      // OFL, licence alongside; the family reserves no font name.
+      provider: fontProviders.local(),
       name: 'Atkinson Hyperlegible Next',
       cssVariable: '--font-sans',
-      weights: ['400 700'],
-      styles: ['normal'],
-      subsets: ['latin'],
       fallbacks: ['sans-serif'],
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/atkinson-hyperlegible-next-latin-wght400-700.woff2'],
+            weight: '400 700',
+            style: 'normal',
+          },
+        ],
+      },
     },
     {
       provider: fontProviders.google(),

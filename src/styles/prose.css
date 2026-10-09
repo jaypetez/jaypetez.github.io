@@ -14,7 +14,7 @@
   max-width: var(--measure);
   font-family: var(--face-serif);
   font-size: var(--text-prose);
-  font-variant-numeric: oldstyle-nums proportional-nums;
+  font-variant-numeric: proportional-nums;
   line-height: var(--leading-prose);
 }
 

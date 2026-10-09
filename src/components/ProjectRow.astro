@@ -6,89 +6,104 @@ interface Props {
 }
 
 const { project } = Astro.props;
+
+const STATUS_LABEL = {
+  active: 'Active',
+  maintained: 'Maintained',
+  experimental: 'Experimental',
+  archived: 'Archived',
+} as const;
 ---
 
-<article class="row">
-  <!--
-    The ledger line: name, language, licence, stars on fixed ch-wide columns,
-    so the alignment holds across every row the way `ls -l` output does. The
-    column widths are set for the longest values in src/data/projects.ts
-    (ollama-mobile, TypeScript, Apache-2.0).
-  -->
-  <div class="ledger">
+<!--
+  One row of the Work ledger. The id is the stack map's link target, so a box
+  in the diagram jumps here; :target then marks the row as "you are here".
+  From 40rem the name and status take a gutter on the left, the same shape as
+  the date gutter in the writing ledger, and the description and metadata sit
+  beside them.
+-->
+<article class="row" id={`project-${project.name}`}>
+  <div class="gutter">
     <h3>
       <a href={project.repo} rel="noopener">
         {project.name}
       </a>
     </h3>
-    <span class="lang">{project.language}</span>
-    <span class="license">{project.license}</span>
-    <span class="tail">
+    <p class="label status">{STATUS_LABEL[project.status]}</p>
+  </div>
+
+  <div class="entry">
+    <p class="description serif">{project.description}</p>
+    <ul class="label meta">
+      <li>{project.language}</li>
+      <li>{project.license}</li>
       {project.stars !== undefined && (
-        <span>
+        <li>
           {/* The glyph is decorative; the number needs the word for screen readers. */}
           <span aria-hidden="true">&#9733;</span>
           <span class="visually-hidden">GitHub stars:</span>
           {project.stars}
-        </span>
+        </li>
       )}
       {project.docs && (
-        <a class="docs" href={project.docs}>
-          docs
-        </a>
+        <li>
+          <a href={project.docs}>Docs</a>
+        </li>
       )}
       {project.live && (
-        <a class="live" href={project.live}>
-          try it
-        </a>
+        <li>
+          <a href={project.live}>Try it</a>
+        </li>
       )}
-    </span>
+    </ul>
   </div>
-
-  <p class="description">{project.description}</p>
 </article>
 
 <style>
-  /* A rule between rows, not a box around each — the card grid is the single
+  /* A rule between rows, not a box around each: the card grid is the single
      most recognisable AI-generated layout, and this is the deliberate opposite. */
   .row {
     padding-block: var(--space-3);
     border-bottom: 1px solid var(--color-border);
+    /* Clear of the page top when the stack map jumps here. */
+    scroll-margin-top: var(--space-4);
   }
 
   .row:first-of-type {
     border-top: 1px solid var(--color-border);
   }
 
-  .ledger {
-    display: grid;
-    grid-template-areas: 'name lang license tail';
-    /* Sized to the longest value each column holds plus one space, as `ls` pads. */
-    grid-template-columns: 15ch 11ch 11ch auto;
-    align-items: baseline;
-    column-gap: 1ch;
-    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: var(--text-sm);
-    color: var(--color-muted);
+  /* "You are here", after following a box in the stack map: the platen behind
+     the row, bled into the page padding so the text does not move. */
+  .row:target {
+    margin-inline: calc(-1 * var(--space-2));
+    padding-inline: var(--space-2);
+    background: var(--color-surface);
   }
 
-  /* Below ~384px the full line cannot hold 42 columns at a readable size, so
-     the metadata drops to a second line — still on the same column grid. */
-  @media (max-width: 24rem) {
-    .ledger {
-      grid-template-areas:
-        'name name tail'
-        'lang license license';
-      grid-template-columns: 15ch 11ch auto;
-      row-gap: var(--space-1);
+  .gutter {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+    margin-bottom: var(--space-1);
+  }
+
+  @media (min-width: 40rem) {
+    .row {
+      display: grid;
+      grid-template-columns: 13rem minmax(0, 1fr);
+      column-gap: var(--space-3);
+    }
+
+    .gutter {
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 0;
     }
   }
 
   h3 {
-    grid-area: name;
-    font-size: inherit;
-    font-weight: 500;
-    letter-spacing: 0;
+    font-size: var(--text-lg);
   }
 
   h3 a {
@@ -96,28 +111,28 @@ const { project } = Astro.props;
     text-decoration-color: var(--color-rule);
   }
 
-  h3 a:hover {
+  h3 a:hover,
+  .row:target h3 a {
     color: var(--color-accent);
+  }
+
+  h3 a:hover {
     text-decoration-color: currentcolor;
-  }
-
-  .lang {
-    grid-area: lang;
-  }
-
-  .license {
-    grid-area: license;
-  }
-
-  .tail {
-    display: flex;
-    grid-area: tail;
-    gap: var(--space-2);
   }
 
   .description {
     max-width: var(--measure);
-    margin-top: var(--space-2);
-    color: var(--color-muted);
+    font-size: var(--text-lg);
+    line-height: var(--leading-body);
+  }
+
+  /* Facts about the project, spaced rather than joined by separators. */
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
   }
 </style>

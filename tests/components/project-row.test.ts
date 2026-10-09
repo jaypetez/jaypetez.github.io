@@ -32,7 +32,7 @@ describe('ProjectRow', () => {
   it('gives the star count a text label, so the glyph is not the only signal', async () => {
     const html = await render(glean);
     expect(html).toContain('GitHub stars:');
-    expect(html).toContain('6');
+    expect(html).toContain(String(glean.stars));
     // The decorative star glyph itself is hidden from assistive tech, so the
     // count is never announced as "star 6".
     expect(html).toMatch(/<span aria-hidden="true"[^>]*>&#9733;<\/span>/);
@@ -51,8 +51,18 @@ describe('ProjectRow', () => {
   it('shows a try-it link only for projects with a hosted build', async () => {
     const html = await render(ideaforge);
     expect(html).toContain(ideaforge.live!);
-    expect(html).toContain('try it');
-    expect(await render(glean)).not.toContain('try it');
+    expect(html).toContain('>Try it<');
+    expect(await render(glean)).not.toContain('Try it');
+  });
+
+  it('says where the project stands, in words', async () => {
+    expect(await render(glean)).toMatch(/class="label status"[^>]*>Active</);
+    const maintained = projects.find((p) => p.status === 'maintained')!;
+    expect(await render(maintained)).toContain('>Maintained<');
+  });
+
+  it('carries the id the stack map links to', async () => {
+    expect(await render(glean)).toContain('id="project-glean"');
   });
 
   it('renders a heading rather than a bare div, so the page has structure', async () => {

@@ -1,0 +1,290 @@
+---
+import { clients, hosts, router, type StackNode } from '../data/stack';
+
+/**
+ * The site's one bold element: a map of the stack these repositories make up,
+ * as deployed. Four agents send requests to agent-gpu, which routes them to
+ * GPU boxes running Ollama or to a phone running ollama-mobile.
+ *
+ * It is a diagram that is also navigation. Every solid box is one of my
+ * projects and links to its row in the Work list below; a dashed box is
+ * hardware or someone else's software and is not a link. The tiers are real
+ * lists, so a screen reader hears three short lists of links in order, and the
+ * caption says in words what the lines say in pictures.
+ *
+ * The connectors are pseudo-elements in --color-line (held to 3:1 by the token
+ * tests, since they carry meaning). From 40rem each client drops onto a shared
+ * bus and a second bus fans out to the hosts; below that the clients sit two by
+ * two and a single trunk joins the tiers, so nothing is ever drawn smaller
+ * than reading size.
+ */
+
+const href = (node: StackNode) => (node.kind === 'project' ? `#project-${node.project}` : '');
+const name = (node: StackNode) => (node.kind === 'project' ? node.project : node.name);
+---
+
+<figure class="stack">
+  <ul class="tier clients" aria-label="Clients">
+    {clients.map((node) => (
+      <li>
+        <a class="node" href={href(node)}>
+          <span class="name">{name(node)}</span>
+          <span class="role">{node.role}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div class="tier router">
+    <a class="node" href={href(router)}>
+      <span class="name">{name(router)}</span>
+      <span class="role">{router.role}</span>
+    </a>
+  </div>
+
+  <ul class="tier hosts" aria-label="Where the models run">
+    {hosts.map((node) =>
+      node.kind === 'project' ? (
+        <li>
+          <a class="node" href={href(node)}>
+            <span class="name">{name(node)}</span>
+            <span class="role">{node.role}</span>
+          </a>
+        </li>
+      ) : (
+        <li>
+          <span class="node external">
+            <span class="name">{name(node)}</span>
+            <span class="role">{node.role}</span>
+          </span>
+        </li>
+      ),
+    )}
+  </ul>
+
+  <figcaption>
+    The stack as deployed: four agents send requests to agent-gpu, which routes each one to a GPU
+    box running Ollama or to a phone running ollama-mobile. Solid boxes are my projects and link to
+    them below; dashed boxes are the machines and software they run on.
+  </figcaption>
+</figure>
+
+<style>
+  /* One connector segment. Tiers sit two segments apart: one down from the
+     tier above to a bus, one from the bus into the tier below. */
+  .stack {
+    --link: var(--space-3);
+    --gap: var(--space-2);
+
+    display: grid;
+    row-gap: calc(2 * var(--link));
+    margin: 0;
+  }
+
+  .tier {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Narrow, the hosts pair up like the clients do, and an odd one out takes
+     the full width beneath rather than squeezing three boxes into a row. */
+  .hosts li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .router {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* The hub: the one box set on the platen, so the eye finds the layer every
+     request passes through. */
+  .router .node {
+    width: min(100%, 22rem);
+    background: var(--color-surface);
+  }
+
+  li {
+    position: relative;
+  }
+
+  .node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    height: 100%;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-chip);
+    background: var(--color-bg);
+    color: var(--color-fg);
+    text-align: center;
+    text-decoration: none;
+    transition: border-color var(--duration) var(--ease);
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  .role {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  a.node:hover,
+  a.node:focus-visible {
+    border-color: var(--color-accent);
+  }
+
+  a.node:hover .name,
+  a.node:focus-visible .name {
+    color: var(--color-accent);
+  }
+
+  /* Dashed means "not one of mine": the machines, and Ollama on them. */
+  .external {
+    border-style: dashed;
+  }
+
+  /* ---- Connectors, narrow: one trunk through the middle of the tiers ---- */
+
+  .router::before,
+  .router::after {
+    position: absolute;
+    left: 50%;
+    height: calc(2 * var(--link));
+    border-left: 1px solid var(--color-line);
+    content: '';
+  }
+
+  .router::before {
+    bottom: 100%;
+  }
+
+  .router::after {
+    top: 100%;
+  }
+
+  /* Arrowheads where requests arrive: drawn with borders, in the line colour. */
+  .router .node::before,
+  .hosts::before {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    border-inline: 4px solid transparent;
+    border-top: 6px solid var(--color-line);
+    transform: translateX(-50%);
+    content: '';
+  }
+
+  /* ---- Connectors, wide: a drop from every client and a rise to every host ---- */
+
+  @media (min-width: 40rem) {
+    .clients {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .hosts {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .hosts li:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+
+    .router::before {
+      height: var(--link);
+    }
+
+    .router::after {
+      height: var(--link);
+    }
+
+    /* Each client drops one segment onto the bus... */
+    .clients li::after {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      height: var(--link);
+      border-left: 1px solid var(--color-line);
+      content: '';
+    }
+
+    /* ...and draws its own stretch of the bus, bridging the gap to the next, */
+    /* so the bus runs exactly from the first centre to the last. */
+    .clients li::before {
+      position: absolute;
+      top: calc(100% + var(--link));
+      right: calc(-1 * var(--gap));
+      left: 0;
+      border-top: 1px solid var(--color-line);
+      content: '';
+    }
+
+    .clients li:first-child::before {
+      left: 50%;
+    }
+
+    .clients li:last-child::before {
+      right: 50%;
+    }
+
+    /* The same in reverse for the hosts: a bus above, a rise into each box. */
+    .hosts::before {
+      content: none;
+    }
+
+    .hosts li::before {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      height: var(--link);
+      border-left: 1px solid var(--color-line);
+      content: '';
+    }
+
+    .hosts li::after {
+      position: absolute;
+      bottom: calc(100% + var(--link));
+      right: calc(-1 * var(--gap));
+      left: 0;
+      border-top: 1px solid var(--color-line);
+      content: '';
+    }
+
+    .hosts li:first-child::after {
+      left: 50%;
+    }
+
+    .hosts li:last-child::after {
+      right: 50%;
+    }
+
+    .hosts .node::before {
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      border-inline: 4px solid transparent;
+      border-top: 6px solid var(--color-line);
+      transform: translateX(-50%);
+      content: '';
+    }
+  }
+
+  /* The grid's row gap is sized for connectors; the caption has none, so it
+     takes back half of it. */
+  figcaption {
+    max-width: var(--measure);
+    margin-top: calc(-1 * var(--link));
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+</style>
