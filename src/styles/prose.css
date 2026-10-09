@@ -104,6 +104,51 @@
   color: var(--color-muted);
 }
 
+/* A chart is the one figure that can't be drawn in characters. It is inline
+   SVG rather than an image so its marks take the same tokens as everything
+   else and follow the theme toggle and the print sheet. The SVG carries no
+   colours of its own (tests/content/post-figures.test.ts); these classes do. */
+.prose figure svg {
+  /* Centred under a caption that may run wider than the drawing. */
+  margin-inline: auto;
+  color: var(--color-muted);
+  font-family: var(--face-sans);
+}
+
+.prose figure svg text {
+  fill: currentColor;
+}
+
+.prose .chart-rule {
+  fill: none;
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.prose .chart-grid {
+  stroke: var(--color-rule);
+  stroke-width: 1;
+}
+
+.prose .chart-mark {
+  fill: var(--color-muted);
+  /* A ring in the page colour keeps neighbouring dots apart without a border. */
+  stroke: var(--color-bg);
+  stroke-width: 2;
+}
+
+.prose .chart-key {
+  fill: var(--color-accent);
+}
+
+.prose .chart-hit {
+  fill: transparent;
+}
+
+.prose .chart-name {
+  fill: var(--color-fg);
+}
+
 .prose figcaption {
   margin-top: var(--space-2);
   color: var(--color-muted);
