@@ -45,6 +45,7 @@ const STATIC_PAGES: readonly (readonly [string, string])[] = [
   ['writing index', 'writing/index.html'],
   ['topics index', 'writing/topics/index.html'],
   ['about', 'about/index.html'],
+  ['search', 'search/index.html'],
   ['404', '404.html'],
 ];
 
@@ -125,7 +126,32 @@ describe('build output', () => {
     for (const path of paths) {
       expect(sitemap).toContain(`https://jaypetez.github.io/${path}`);
     }
+    // A tool, not a page anyone should arrive at from a search engine.
+    expect(sitemap).not.toContain('https://jaypetez.github.io/search/');
   });
+
+  it('builds a search index covering every essay, the About page, and the Work list', () => {
+    expect(existsSync(join(DIST, 'pagefind', 'pagefind.js'))).toBe(true);
+    const entry = JSON.parse(read('pagefind/pagefind-entry.json')) as {
+      languages: Record<string, { page_count: number }>;
+    };
+    const pages = Object.values(entry.languages).reduce((sum, l) => sum + l.page_count, 0);
+    expect(pages).toBe(POST_SLUGS.length + 2);
+  });
+
+  it('loads the search script once on /search/, where the form appears twice', () => {
+    const scripts = [
+      ...read('search/index.html').matchAll(/<script[^>]*src="\/_astro\/Search[^"]*"/g),
+    ];
+    expect(scripts).toHaveLength(1);
+  });
+
+  it.each(PAGES)(
+    '%s never links the search index, which loads only when search opens',
+    (_label, file) => {
+      expect(read(file)).not.toMatch(/(href|src)="\/pagefind\//);
+    },
+  );
 
   it.each(PAGES)('%s leaks no dev-server URLs', (_label, file) => {
     expect(read(file)).not.toMatch(/localhost|127\.0\.0\.1/);
@@ -300,7 +326,10 @@ describe('essay contents', () => {
     '%s: the contents list mirrors the h2 sections in order, or is absent for a short post',
     (_slug, file) => {
       const html = read(file);
-      const sections = [...html.matchAll(/<h2 id="([^"]+)"/g)].map((m) => m[1]!);
+      // The essay's sections are the h2s inside its article; the site header
+      // carries one of its own (the search dialog's) that is not a section.
+      const article = html.slice(html.indexOf('<article'), html.indexOf('</article>'));
+      const sections = [...article.matchAll(/<h2 id="([^"]+)"/g)].map((m) => m[1]!);
       const nav = html.match(/<nav[^>]*aria-labelledby="contents-label"[^>]*>([\s\S]*?)<\/nav>/);
 
       if (sections.length < 2) {

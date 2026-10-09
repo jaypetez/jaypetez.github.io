@@ -42,6 +42,7 @@ build. They aren't accidents:
 | View-transition names unique per page; each essay's list row and `h1` share one | same |
 | Two preloaded fonts, under 100 KB of fonts plus stylesheet, under 6 KB of JavaScript on every page | same |
 | An essay's contents list mirrors its `h2` sections, in order | same |
+| The search index covers every essay, About, and Work; nothing links `/pagefind/`; `/search/` stays out of the sitemap | same |
 | Post headings are not numbered by hand (the layout numbers them) | `tests/content/blog-schema.test.ts` |
 | Tags are lowercase-hyphenated (each is its topic page's URL); no post is named `topics` | `src/content.config.ts`, `tests/content/blog-schema.test.ts` |
 
