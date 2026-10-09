@@ -49,7 +49,14 @@ describe('Nav', () => {
     expect(html).toMatch(/href="\/about\/"[^>]*aria-current="page"/);
   });
 
-  it('uses the mono utility for navigation, not the prose serif', async () => {
-    expect(await renderAt('/')).toContain('class="mono"');
+  it('sets navigation in sentence case, not the retired uppercase label utility', async () => {
+    const html = await renderAt('/');
+    expect(html).not.toMatch(/class="[^"]*\bmono\b/);
+    // The labels are written as they should read, not uppercased by CSS.
+    expect(html).toMatch(/>\s*Writing\s*</);
+  });
+
+  it('names the site with its owner, not a username', async () => {
+    expect(await renderAt('/')).toMatch(/class="wordmark"[^>]*>\s*Jayson Petersen\s*</);
   });
 });

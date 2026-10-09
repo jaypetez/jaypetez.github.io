@@ -9,30 +9,30 @@
  */
 ---
 
-<button id="theme-toggle" type="button" class="mono" aria-label="Colour theme: system">
+<button id="theme-toggle" type="button" aria-label="Colour theme: system">
   <span data-theme-label>Auto</span>
 </button>
 
 <style>
-  /* No border box: the toggle sits in the header as a peer of the nav
-     labels, distinguished by being lowercase — a config value, not a page. */
+  /* No border box: the toggle sits in the header as a peer of the nav links,
+     the same size and colour, so it reads as part of the bar rather than as a
+     call to action. */
   button {
     padding: var(--space-1);
+    margin-inline-end: calc(-1 * var(--space-1));
     border: 0;
     background: transparent;
     color: var(--color-muted);
     font: inherit;
-    letter-spacing: inherit;
-    text-transform: lowercase;
+    font-weight: 500;
     cursor: pointer;
-    transition: color var(--duration) var(--ease);
   }
 
   button:hover {
     color: var(--color-fg);
     text-decoration: underline;
     text-decoration-color: var(--color-rule);
-    text-underline-offset: 0.3em;
+    text-underline-offset: 0.4em;
   }
 </style>
 
