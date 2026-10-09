@@ -208,10 +208,13 @@ video {
 
 /* ----------------------------------------------------------- typography ---- */
 
+/* Headings are interface type wherever they sit, prose included; the title of
+   a written work opts into the serif with .title below. */
 h1,
 h2,
 h3,
 h4 {
+  font-family: var(--face-sans);
   font-weight: 600;
   line-height: var(--leading-tight);
   text-wrap: balance;
@@ -319,15 +322,6 @@ pre {
   font-weight: 500;
 }
 
-/* Retired with the layout refresh; kept until every component has moved off it. */
-.mono {
-  font-family: var(--face-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .page {
   max-width: var(--page-max);
   margin-inline: auto;
@@ -375,22 +369,6 @@ pre {
 
 .skip-link:focus {
   transform: translateY(0);
-}
-
-/* Retired with the layout refresh; kept until every component has moved off it. */
-.section-label {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-  margin-bottom: var(--space-3);
-  color: var(--color-muted);
-}
-
-.section-label::after {
-  flex: 1;
-  height: 1px;
-  background: var(--color-rule);
-  content: '';
 }
 
 /* ---------------------------------------------------------------- motion ---- */

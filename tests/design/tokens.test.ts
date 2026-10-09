@@ -240,6 +240,75 @@ describe('anti-slop rules', () => {
     expect(Number(base![1]) * 16).toBeGreaterThanOrEqual(16);
   });
 
+  // The tells below are the second wave: what generated sites converged on once
+  // the gradient and the Inter default became recognisable, including the
+  // "tasteful" defaults this site itself used to wear.
+
+  it('uses no frosted glass — backdrop blur on a sticky header is the 2025 default', () => {
+    for (const { file, css } of styles) {
+      expect(stripComments(css), `backdrop-filter found in ${file}`).not.toMatch(
+        /backdrop-filter\s*:/,
+      );
+    }
+  });
+
+  it('sets nothing in tracked capitals — labels are written in sentence case', () => {
+    for (const { file, css } of styles) {
+      expect(stripComments(css), `uppercase found in ${file}`).not.toMatch(
+        /text-transform:\s*uppercase/,
+      );
+    }
+  });
+
+  it('strings no metadata together with middle dots', () => {
+    for (const { file, css } of styles) {
+      expect(stripComments(css), `middle-dot separator found in ${file}`).not.toMatch(
+        /content:\s*['"][^'"]*(·|\\b7)/,
+      );
+    }
+  });
+
+  it('avoids the faces generated sites reach for after Inter', () => {
+    const banned =
+      /\b(Geist|Space Grotesk|Instrument (Sans|Serif)|Syne|Fraunces|DM Sans|Manrope|Plus Jakarta)\b/;
+    const config = readFileSync(join(ROOT, 'astro.config.mjs'), 'utf8');
+    expect(config, 'banned face in astro.config.mjs').not.toMatch(banned);
+    for (const { file, css } of styles) {
+      expect(stripComments(css), `banned face in ${file}`).not.toMatch(banned);
+    }
+  });
+
+  it('only animates page changes for visitors who have not asked for reduced motion', () => {
+    // The global reduced-motion rule cannot reach ::view-transition-*, so the
+    // opt-in itself has to sit inside the guard.
+    const clean = stripComments(GLOBAL_CSS);
+    const opener = clean.indexOf('@media (prefers-reduced-motion: no-preference)');
+    expect(opener, 'no reduced-motion guard for view transitions').toBeGreaterThan(-1);
+
+    // Walk the braces to find where the guarded block closes.
+    let depth = 0;
+    let close = -1;
+    for (let i = clean.indexOf('{', opener); i < clean.length; i++) {
+      if (clean[i] === '{') depth++;
+      if (clean[i] === '}' && --depth === 0) {
+        close = i;
+        break;
+      }
+    }
+
+    const transitions = [...clean.matchAll(/@view-transition/g)].map((m) => m.index!);
+    expect(transitions.length).toBeGreaterThan(0);
+    for (const at of transitions) {
+      expect(at > opener && at < close, '@view-transition outside the guard').toBe(true);
+    }
+    for (const { file, css } of styles) {
+      if (file.endsWith('global.css')) continue;
+      expect(stripComments(css), `${file} opts into view transitions`).not.toContain(
+        '@view-transition',
+      );
+    }
+  });
+
   it('uses a fixed z-index scale rather than arbitrary values', () => {
     const zIndexes = [...GLOBAL_CSS.matchAll(/--z-[a-z]+:\s*(\d+)/g)].map((m) => Number(m[1]));
     expect(zIndexes.length).toBeGreaterThan(0);

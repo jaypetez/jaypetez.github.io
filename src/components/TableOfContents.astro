@@ -58,6 +58,19 @@ const sections = headings.filter((heading) => heading.depth === 2);
     cursor: pointer;
   }
 
+  /* In the rail the list is always open, so the toggle reads as a plain label:
+     no disclosure triangle, nothing to click. */
+  @media (min-width: 64rem) {
+    summary {
+      list-style: none;
+      pointer-events: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+  }
+
   /* The links' targets form a scroll-target group, so the browser itself
      tracks which section is on screen and matches it with :target-current. */
   ol {

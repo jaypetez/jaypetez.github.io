@@ -27,19 +27,27 @@ build. They aren't accidents:
 
 | Rule | Where |
 | --- | --- |
-| No gradients of any kind, no `box-shadow` | `tests/design/tokens.test.ts` |
-| No `Inter`, no bare system-sans stack | same |
+| No gradients of any kind, no `box-shadow`, no `backdrop-filter` | `tests/design/tokens.test.ts` |
+| No `Inter`, no bare system-sans stack, none of Geist, Space Grotesk, Instrument, Syne, Fraunces, DM Sans, Manrope, Plus Jakarta | same |
+| No `text-transform: uppercase`, no middle-dot separators in CSS `content` | same |
 | `border-radius` only from the token set (`0` or `--radius-chip`) | same |
 | `z-index` only from the `--z-*` scale | same |
-| Contrast recomputed from tokens: AA minimum, AAA for body and muted text | same |
+| Contrast recomputed from tokens: AA minimum, AAA for body and muted text (on paper and on the code surface), 3:1 for diagram lines | same |
 | 8px spacing base unit, prose measure 65–75 characters, strictly increasing type scale | same |
+| `@view-transition` only inside the `prefers-reduced-motion: no-preference` guard in `global.css` | same |
+| Every stack-map box names a project in `src/data/projects.ts` and links to its row | `tests/components/stack-map.test.ts` |
 | One `h1` per page, skip link before the nav, zero axe violations | `tests/build/output.test.ts` |
-| Every internal link resolves, every fragment link has a target | same |
+| Every internal link resolves, every fragment link on every page has a target | same |
+| No arrows (`→`, `&rarr;`) in link text | same |
+| View-transition names unique per page; each essay's list row and `h1` share one | same |
+| Two preloaded fonts, under 100 KB of fonts plus stylesheet, under 6 KB of JavaScript on every page | same |
 | An essay's contents list mirrors its `h2` sections, in order | same |
 | Post headings are not numbered by hand (the layout numbers them) | `tests/content/blog-schema.test.ts` |
+| Tags are lowercase-hyphenated (each is its topic page's URL); no post is named `topics` | `src/content.config.ts`, `tests/content/blog-schema.test.ts` |
 
 All design values live in `src/styles/global.css`. If you need a new value, add a token — don't
-hard-code it in a component.
+hard-code it in a component. Stylesheets that only some pages need (`prose.css`, `essay.css`) use
+those tokens; they never define their own.
 
 ## Getting set up
 
