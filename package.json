@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind",
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run tests/unit tests/components tests/content tests/design",
@@ -37,6 +37,7 @@
     "@vitest/coverage-v8": "^5.0.1",
     "axe-core": "^4.13.0",
     "happy-dom": "^20.11.6",
+    "pagefind": "^1.5.2",
     "prettier": "^3.9.8",
     "prettier-plugin-astro": "^1.0.1",
     "typescript": "^5.9.3",

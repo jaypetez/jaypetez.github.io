@@ -6,7 +6,7 @@
 
 Source for my personal site and blog: **<https://jaypetez.github.io/>**
 
-Built with [Astro](https://astro.build), no client-side framework, and under 1 KB of JavaScript on
+Built with [Astro](https://astro.build), no client-side framework, and about 2 KB of JavaScript on
 the wire. Static HTML, self-hosted fonts, and a design system that a test suite keeps honest.
 
 ## Why it looks the way it does
@@ -29,7 +29,9 @@ Essays are built to be read rather than scrolled past. The description becomes a
 contents list sits in a rail beside the text on a wide screen (folded above it on a phone) and marks
 the section you are in; a hairline across the top shows how far through you are; a right margin
 holds notes and pull quotes, so a long page has somewhere for the eye to land; and the end of each
-essay links the ones either side and the ones that share its topics. Every tag has a page. The only motion is the essay
+essay links the ones either side and the ones that share its topics. Every tag has a page, and Ctrl+K (Cmd+K on a Mac)
+searches everything, from a static [Pagefind](https://pagefind.app) index that is only fetched
+when search is opened. The only motion is the essay
 title travelling from the list into the page, a cross-document view transition that needs no
 JavaScript and is off for anyone who has asked for reduced motion.
 
@@ -59,7 +61,7 @@ npm run dev          # http://localhost:4321
 | Command               | What it does                                                     |
 | --------------------- | ---------------------------------------------------------------- |
 | `npm run dev`         | Dev server with hot reload; drafts are visible                    |
-| `npm run build`       | Static build to `dist/`                                           |
+| `npm run build`       | Static build to `dist/`, then the Pagefind search index           |
 | `npm run preview`     | Serve the built output locally                                    |
 | `npm run check`       | `astro check` — types and template diagnostics                    |
 | `npm test`            | Unit, component, content, and design-token tests                  |

@@ -1,0 +1,13 @@
+# Pagefind builds the search index from the finished site, after astro build
+# (see the build script). Only elements marked data-pagefind-body are indexed:
+# essays, the About page, and the Work list. Within those, skip what repeats or
+# is chrome, so a result's excerpt is always the essay's own running text.
+site: dist
+exclude_selectors:
+  # Metadata lines (an essay's dateline, a project's language and licence,
+  # its status) are facts about the text, not the text.
+  - '.meta'
+  - '.status'
+  - 'nav.contents'
+  - '.essay-footer'
+  - '.pull'
