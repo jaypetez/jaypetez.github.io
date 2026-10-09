@@ -83,6 +83,15 @@ export const projects: readonly Project[] = [
     repo: 'https://github.com/jaypetez/sidekick',
   },
   {
+    name: 'famlobster',
+    description:
+      'A self-hosted Telegram assistant for the family group chat. Ask in plain English and it edits the Google Calendar, keeps shopping and to-do lists, sends email, and runs recurring reminders, with Claude calling Google through an MCP server.',
+    language: 'Python',
+    license: 'MIT',
+    status: 'active',
+    repo: 'https://github.com/jaypetez/famlobster',
+  },
+  {
     name: 'agent-gpu',
     description:
       'A distributed inference layer for Ollama. Forwards agent requests to remote GPU-backed Ollama instances behind one clean API, so open models can run anywhere on your network.',
