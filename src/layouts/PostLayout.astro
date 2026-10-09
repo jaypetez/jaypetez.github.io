@@ -40,7 +40,9 @@ const { title, description, pubDate, updatedDate, minutes, tags = [], headings =
     </div>
 
     <footer>
-      <a class="mono" href="/writing/">&larr; All writing</a>
+      <a class="mono" href="/writing/">
+        &larr; All writing
+      </a>
     </footer>
   </article>
 </BaseLayout>
@@ -95,8 +97,7 @@ const { title, description, pubDate, updatedDate, minutes, tags = [], headings =
       grid-area: footer;
     }
 
-    /* Placed in the body row only, so it starts level with the first
-       paragraph and stops sticking when the essay ends. */
+    /* Body row only: starts level with the first paragraph, stops with the essay. */
     .margin {
       display: block;
       grid-area: margin;

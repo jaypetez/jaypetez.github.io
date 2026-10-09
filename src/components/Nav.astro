@@ -22,23 +22,23 @@ function isCurrent(href: string): boolean {
 
 <header class="site-header">
   <div class="page bar">
-    <a class="wordmark" href="/">jaypetez</a>
+    <a class="wordmark" href="/">
+      jaypetez
+    </a>
 
     <nav aria-label="Main">
       <ul>
-        {
-          links.map((link) => (
-            <li>
-              <a
-                class="mono"
-                href={link.href}
-                aria-current={isCurrent(link.href) ? 'page' : undefined}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
+        {links.map((link) => (
+          <li>
+            <a
+              class="mono"
+              href={link.href}
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
 
@@ -75,8 +75,7 @@ function isCurrent(href: string): boolean {
   .wordmark {
     color: var(--color-fg);
     font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
-    /* Body size, not label size: it is the one piece of chrome that names the
-       site, and at 17px it still clears a 320px header with room to spare. */
+    /* Body size, not label size: the one piece of chrome that names the site. */
     font-size: var(--text-base);
     font-weight: 500;
     text-decoration: none;

@@ -21,17 +21,15 @@ const posts = publishedPosts<CollectionEntry<'blog'>>(
     </p>
   </div>
 
-  {
-    posts.length === 0 ? (
-      <p class="empty">No posts yet.</p>
-    ) : (
-      <ul class="posts">
-        {posts.map((post) => (
-          <PostRow post={post} />
-        ))}
-      </ul>
-    )
-  }
+  {posts.length === 0 ? (
+    <p class="empty">No posts yet.</p>
+  ) : (
+    <ul class="posts">
+      {posts.map((post) => (
+        <PostRow post={post} />
+      ))}
+    </ul>
+  )}
 </BaseLayout>
 
 <style>

@@ -16,36 +16,30 @@ const keywords = [...new Set(tags.map((tag) => tag.toLowerCase()))];
 
 <p class="meta mono">
   <time datetime={toISODate(pubDate)}>{formatDate(pubDate)}</time>
-  {
-    updatedDate && (
-      <>
-        <span aria-hidden="true">&middot;</span>
-        <span>
-          Updated <time datetime={toISODate(updatedDate)}>{formatDate(updatedDate)}</time>
-        </span>
-      </>
-    )
-  }
-  {
-    minutes !== undefined && (
-      <>
-        <span aria-hidden="true">&middot;</span>
-        <span>{minutes} min read</span>
-      </>
-    )
-  }
-  {
-    keywords.length > 0 && (
-      <span class="tags">
-        {/* Inside the group, so when the tags wrap to a new line the separator goes with them. */}
-        <span aria-hidden="true">&middot;</span>
-        <span class="visually-hidden">Tagged</span>
-        {keywords.map((tag) => (
-          <span class="tag">{tag}</span>
-        ))}
+  {updatedDate && (
+    <>
+      <span aria-hidden="true">&middot;</span>
+      <span>
+        Updated <time datetime={toISODate(updatedDate)}>{formatDate(updatedDate)}</time>
       </span>
-    )
-  }
+    </>
+  )}
+  {minutes !== undefined && (
+    <>
+      <span aria-hidden="true">&middot;</span>
+      <span>{minutes} min read</span>
+    </>
+  )}
+  {keywords.length > 0 && (
+    <span class="tags">
+      {/* Inside the group, so when the tags wrap to a new line the separator goes with them. */}
+      <span aria-hidden="true">&middot;</span>
+      <span class="visually-hidden">Tagged</span>
+      {keywords.map((tag) => (
+        <span class="tag">{tag}</span>
+      ))}
+    </span>
+  )}
 </p>
 
 <style>
@@ -54,8 +48,7 @@ const keywords = [...new Set(tags.map((tag) => tag.toLowerCase()))];
     flex-wrap: wrap;
     gap: var(--space-1);
     align-items: baseline;
-    /* Kept to the prose measure so the line sits with the text it describes
-       rather than drifting to the far page edge. */
+    /* Kept to the prose measure, so the line sits with the text it describes. */
     max-width: var(--measure);
     color: var(--color-muted);
   }

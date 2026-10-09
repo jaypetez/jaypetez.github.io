@@ -17,35 +17,31 @@ const { project } = Astro.props;
   -->
   <div class="ledger">
     <h3>
-      <a href={project.repo} rel="noopener">{project.name}</a>
+      <a href={project.repo} rel="noopener">
+        {project.name}
+      </a>
     </h3>
     <span class="lang">{project.language}</span>
     <span class="license">{project.license}</span>
     <span class="tail">
-      {
-        project.stars !== undefined && (
-          <span>
-            {/* The glyph is decorative; the number needs the word for screen readers. */}
-            <span aria-hidden="true">&#9733;</span>
-            <span class="visually-hidden">GitHub stars:</span>
-            {project.stars}
-          </span>
-        )
-      }
-      {
-        project.docs && (
-          <a class="docs" href={project.docs}>
-            docs
-          </a>
-        )
-      }
-      {
-        project.live && (
-          <a class="live" href={project.live}>
-            try it
-          </a>
-        )
-      }
+      {project.stars !== undefined && (
+        <span>
+          {/* The glyph is decorative; the number needs the word for screen readers. */}
+          <span aria-hidden="true">&#9733;</span>
+          <span class="visually-hidden">GitHub stars:</span>
+          {project.stars}
+        </span>
+      )}
+      {project.docs && (
+        <a class="docs" href={project.docs}>
+          docs
+        </a>
+      )}
+      {project.live && (
+        <a class="live" href={project.live}>
+          try it
+        </a>
+      )}
     </span>
   </div>
 
@@ -67,8 +63,7 @@ const { project } = Astro.props;
   .ledger {
     display: grid;
     grid-template-areas: 'name lang license tail';
-    /* Sized to the longest value each column holds, plus one space, exactly
-       the way `ls` pads its columns — contiguous, not justified apart. */
+    /* Sized to the longest value each column holds plus one space, as `ls` pads. */
     grid-template-columns: 15ch 11ch 11ch auto;
     align-items: baseline;
     column-gap: 1ch;
