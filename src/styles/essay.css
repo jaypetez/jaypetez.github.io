@@ -1,0 +1,193 @@
+/*
+ * Devices only an essay uses: section numbers, margin notes, pull quotes,
+ * labelled code, and the reading-progress line. Imported by PostLayout alone,
+ * so no other page pays for them. Tokens come only from global.css; the
+ * shared prose rhythm is in prose.css.
+ *
+ * The essay grid (PostLayout) is one column below 64rem, gains a contents
+ * rail on the left at 64rem, and a right margin at 80rem. Everything here that
+ * reaches into that margin is written to fall back into the text column when
+ * the margin does not exist, so the essay reads the same at every width.
+ */
+
+/* ---------------------------------------------------------- sections ---- */
+
+/* RFC-style section numbers, from the same count the contents list uses.
+   The empty alternative text keeps screen readers from announcing "1." as
+   part of the heading. */
+.essay-body {
+  counter-reset: section;
+}
+
+.essay-body h2 {
+  counter-increment: section;
+  /* Room above the heading when a contents link jumps here. */
+  scroll-margin-top: var(--space-4);
+}
+
+.essay-body h2::before {
+  content: counter(section) '. ' / '';
+  color: var(--color-muted);
+}
+
+/* With a rail to the left, the number hangs in the gutter so every section
+   title starts on the text's own edge. */
+@media (min-width: 64rem) {
+  .essay-body h2 {
+    position: relative;
+  }
+
+  .essay-body h2::before {
+    position: absolute;
+    right: 100%;
+    padding-inline-end: 0.6em;
+    content: counter(section) '.' / '';
+  }
+}
+
+/* -------------------------------------------------------------- code ---- */
+
+/* Code says what language it is, in the corner, on the platen. Shiki puts the
+   language on the element; the figure drawings are not highlighted, so they
+   never carry one. */
+.essay-body pre[data-language] {
+  position: relative;
+  padding-top: var(--space-4);
+}
+
+.essay-body pre[data-language]::before {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-2);
+  color: var(--color-muted);
+  font-family: var(--face-sans);
+  font-size: var(--text-xs);
+  content: attr(data-language) / '';
+}
+
+/* --------------------------------------------------- notes and quotes ---- */
+
+/*
+ * A margin note is an aside written inline, inside its paragraph:
+ *   <span class="note">which is cheaper than it sounds</span>
+ * Narrow, it reads in place as the parenthetical it was, in graphite. From
+ * 80rem it floats out into the right margin beside the line it belongs to, in
+ * the interface face, and the sentence closes up around it.
+ */
+.note {
+  color: var(--color-muted);
+}
+
+.note::before {
+  content: '(' / '';
+}
+
+.note::after {
+  content: ')' / '';
+}
+
+/*
+ * A pull quote repeats a sentence from the essay at display size, to give a
+ * long page somewhere for the eye to land. It is aria-hidden, because the
+ * sentence is already in the text, and at most one per essay
+ * (tests/content enforces both, and that the words are lifted verbatim).
+ */
+.pull {
+  margin-block: var(--space-6);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-fg);
+  font-family: var(--face-serif);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.pull p {
+  margin: 0;
+}
+
+@media (min-width: 80rem) {
+  .note {
+    float: right;
+    clear: right;
+    width: var(--rail);
+    /* Out across the gap and into the margin column. */
+    margin-right: calc(-1 * (var(--rail) + var(--space-6)));
+    margin-top: 0.3em;
+    font-family: var(--face-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+  }
+
+  .note::before,
+  .note::after {
+    content: none;
+  }
+
+  .pull {
+    margin-right: calc(-1 * (var(--rail) + var(--space-6)));
+    font-size: var(--text-3xl);
+  }
+}
+
+/* ---------------------------------------------------------- progress ---- */
+
+/*
+ * How far through the essay the reader is: a hairline of patch blue across
+ * the top of the window, driven by the scroll position itself. Where scroll
+ * timelines are not supported it is simply not drawn.
+ */
+.progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: var(--z-top);
+    display: block;
+    height: 2px;
+    background: var(--color-accent);
+    transform-origin: 0 50%;
+    animation: progress linear both;
+    animation-duration: auto;
+    animation-timeline: scroll(root);
+  }
+
+  @keyframes progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* ------------------------------------------------------------- print ---- */
+
+@media print {
+  .progress,
+  .pull {
+    display: none;
+  }
+
+  .note {
+    float: none;
+    width: auto;
+    margin: 0;
+    font: inherit;
+  }
+
+  .note::before {
+    content: '(' / '';
+  }
+
+  .note::after {
+    content: ')' / '';
+  }
+}

@@ -31,12 +31,24 @@ describe('TableOfContents', () => {
     expect(html).toMatch(/id="contents-label"[^>]*>\s*Contents/);
   });
 
+  it('is a disclosure, so on a phone it folds away above the text instead of filling the screen', async () => {
+    const html = await render({ headings });
+    expect(html).toMatch(/<details[^>]*>\s*<summary[^>]*id="contents-label"/);
+    // Closed in the markup; the script opens it only where there is a rail.
+    expect(html).not.toMatch(/<details[^>]*\sopen/);
+  });
+
   it('adds no heading element, so the essay keeps one h1 and its own h2 count', async () => {
     expect(await render({ headings })).not.toMatch(/<h[1-6][\s>]/);
   });
 
   it('renders nothing for a post with fewer than two sections', async () => {
-    expect((await render({ headings: headings.slice(0, 1) })).trim()).toBe('');
-    expect((await render({ headings: [] })).trim()).toBe('');
+    // The container emits the component's script tag regardless; in a build it
+    // is bundled and hoisted, and finds no contents list to act on. The markup
+    // is what must be empty.
+    const markup = async (props: Record<string, unknown>) =>
+      (await render(props)).replace(/<script[\s\S]*?<\/script>/g, '').trim();
+    expect(await markup({ headings: headings.slice(0, 1) })).toBe('');
+    expect(await markup({ headings: [] })).toBe('');
   });
 });

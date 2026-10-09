@@ -3,138 +3,164 @@ import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import PostMeta from '../components/PostMeta.astro';
 import TableOfContents from '../components/TableOfContents.astro';
+import EssayFooter from '../components/EssayFooter.astro';
 import '../styles/prose.css';
+import '../styles/essay.css';
+
+interface Entry {
+  readonly id: string;
+  readonly data: { readonly title: string };
+}
 
 interface Props {
+  /** The post's id, which names its title for the view transition. */
+  id: string;
   title: string;
   description: string;
   pubDate: Date;
   updatedDate?: Date | undefined;
   minutes: number;
   tags?: readonly string[];
-  /** From render(post); drives the margin table of contents. */
+  /** From render(post); drives the contents list. */
   headings?: readonly MarkdownHeading[];
+  /** For the essay footer: neighbours in date order, and related by topic. */
+  older?: Entry | undefined;
+  newer?: Entry | undefined;
+  related?: readonly Entry[];
 }
 
-const { title, description, pubDate, updatedDate, minutes, tags = [], headings = [] } = Astro.props;
+const {
+  id,
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  minutes,
+  tags = [],
+  headings = [],
+  older,
+  newer,
+  related = [],
+} = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} type="article">
+<BaseLayout title={title} description={description} type="article" width="wide">
+  <div class="progress" aria-hidden="true"></div>
+
   <article class="post">
     <header>
-      <h1 class="title">{title}</h1>
+      <h1 class="title" style={`view-transition-name: post-${id}`}>
+        {title}
+      </h1>
+      <!-- The standfirst: the description, which already says what the essay
+           argues in one or two sentences, set where a reader decides to start. -->
+      <p class="standfirst serif">{description}</p>
       <PostMeta pubDate={pubDate} updatedDate={updatedDate} minutes={minutes} tags={tags} />
     </header>
 
-    <!--
-      The right margin, which is empty on a wide screen and does not exist on a
-      phone. It holds the contents list beside the essay from 64rem up; below
-      that the list is hidden rather than stacked above the text, where it
-      would be a screen of chrome before the first sentence.
-    -->
-    <div class="margin">
+    <div class="rail">
       <TableOfContents headings={headings} />
     </div>
 
-    <div class="prose body">
+    <div class="prose essay-body">
       <slot />
     </div>
 
-    <footer>
-      <a class="mono" href="/writing/">
-        &larr; All writing
-      </a>
-    </footer>
+    <div class="after">
+      <EssayFooter older={older} newer={newer} related={related} />
+    </div>
   </article>
 </BaseLayout>
 
 <style>
   .post {
-    padding-block: var(--space-6);
+    padding-block: var(--space-8) 0;
   }
 
   header {
-    max-width: var(--measure);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-rule);
+    max-width: 48rem;
+    margin-bottom: var(--space-6);
   }
 
-  /* Fluid between the two scale steps: display size on a desktop, one step
-     down on a phone so a two-line title does not become four. */
-  header h1 {
-    margin-bottom: var(--space-2);
-    font-size: clamp(var(--text-2xl), 1.25rem + 2vw, var(--text-3xl));
+  /* Fluid between the display steps, so a two-line title on a phone does not
+     become four. */
+  h1 {
+    font-size: var(--text-display);
+    line-height: var(--leading-tight);
   }
 
-  .body {
-    margin-top: var(--space-4);
-    counter-reset: section;
+  .standfirst {
+    margin-block: var(--space-3);
+    color: var(--color-muted);
+    font-size: var(--text-xl);
+    line-height: var(--leading-snug);
   }
 
-  .margin {
-    display: none;
+  .rail {
+    margin-bottom: var(--space-4);
   }
 
+  .after {
+    margin-top: var(--space-8);
+  }
+
+  /*
+   * From 64rem: a contents rail on the left, sticky beside the text, with the
+   * header and footer aligned to the text column rather than the rail. The
+   * rail sits in the body row only, so it starts level with the first
+   * paragraph and stops with the essay, never riding over the footer.
+   */
   @media (min-width: 64rem) {
     .post {
       display: grid;
+      grid-template-columns: var(--rail) minmax(0, 1fr);
       grid-template-areas:
-        'header .'
-        'body margin'
-        'footer .';
-      grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
-      column-gap: var(--space-8);
+        '. header'
+        'rail body'
+        '. after';
+      column-gap: var(--space-6);
     }
 
     header {
       grid-area: header;
     }
 
-    .body {
+    .essay-body {
       grid-area: body;
     }
 
-    footer {
-      grid-area: footer;
+    .after {
+      grid-area: after;
+      max-width: var(--measure);
     }
 
-    /* Body row only: starts level with the first paragraph, stops with the essay. */
-    .margin {
-      display: block;
-      grid-area: margin;
+    .rail {
       position: sticky;
-      top: var(--space-6);
+      top: var(--space-4);
+      grid-area: rail;
       align-self: start;
-      margin-top: var(--space-4);
+      max-height: calc(100dvh - var(--space-8));
+      margin-bottom: 0;
+      overflow-y: auto;
     }
   }
 
-  /* RFC-style section numbers, from the same count the contents list uses.
-     The empty alternative text keeps screen readers from announcing "1." as
-     part of the heading. Markdown output sits outside this component's
-     scope, hence :global. */
-  .body :global(h2) {
-    counter-increment: section;
-    /* Room for the header when a contents link jumps here. */
-    scroll-margin-top: var(--space-4);
-  }
+  /*
+   * From 80rem: a right margin as wide as the rail, where margin notes and
+   * pull quotes go. The text column is then exactly the measure, so the body
+   * drops its own max-width and the notes can count on its edge.
+   */
+  @media (min-width: 80rem) {
+    .post {
+      grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
+      grid-template-areas:
+        '. header header'
+        'rail body .'
+        '. after .';
+    }
 
-  .body :global(h2)::before {
-    content: counter(section) '. ' / '';
-    color: var(--color-muted);
-  }
-
-  footer {
-    margin-top: var(--space-8);
-    padding-top: var(--space-3);
-    border-top: 1px solid var(--color-rule);
-  }
-
-  footer a {
-    text-decoration: none;
-  }
-
-  footer a:hover {
-    text-decoration: underline;
+    .essay-body {
+      max-width: none;
+    }
   }
 </style>

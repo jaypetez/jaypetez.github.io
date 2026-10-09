@@ -11,8 +11,15 @@ import type { MarkdownHeading } from 'astro';
  * counter, so they always agree with the counter that numbers the h2s in
  * PostLayout; both count the same elements in the same order.
  *
- * Zero JavaScript: it is a list of fragment links. PostLayout decides where it
- * sits (the right margin on wide viewports) and when it is hidden.
+ * One element serves every width. It is a disclosure, closed, above the text
+ * on a phone, where an open list would be a screen of chrome before the first
+ * sentence; from 64rem PostLayout puts it in a sticky rail beside the text and
+ * the script below opens it. Without JavaScript the wide rail shows a closed
+ * "Contents" toggle, which still works.
+ *
+ * The section being read is marked in the list. Where the browser supports
+ * scroll-target-group, that is CSS alone (:target-current); elsewhere the
+ * script marks the link with aria-current as the reader scrolls.
  */
 interface Props {
   headings: readonly MarkdownHeading[];
@@ -24,31 +31,41 @@ const sections = headings.filter((heading) => heading.depth === 2);
 
 {sections.length >= 2 && (
   <nav class="contents" aria-labelledby="contents-label">
-    <p class="section-label mono" id="contents-label">
-      Contents
-    </p>
-    <ol>
-      {sections.map((section) => (
-        <li>
-          <a href={`#${section.slug}`}>{section.text}</a>
-        </li>
-      ))}
-    </ol>
+    <details>
+      <summary id="contents-label">Contents</summary>
+      <ol>
+        {sections.map((section) => (
+          <li>
+            <a href={`#${section.slug}`}>{section.text}</a>
+          </li>
+        ))}
+      </ol>
+    </details>
   </nav>
 )}
 
 <style>
   .contents {
-    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
     font-size: var(--text-sm);
-    line-height: 1.4;
+    line-height: var(--leading-snug);
   }
 
+  summary {
+    width: fit-content;
+    padding-block: var(--space-1);
+    color: var(--color-muted);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* The links' targets form a scroll-target group, so the browser itself
+     tracks which section is on screen and matches it with :target-current. */
   ol {
-    margin: 0;
+    margin: var(--space-1) 0 0;
     padding: 0;
     list-style: none;
     counter-reset: contents;
+    scroll-target-group: auto;
   }
 
   /* Number in a 3ch column, text beside it, so wrapped titles hang under
@@ -57,7 +74,7 @@ const sections = headings.filter((heading) => heading.depth === 2);
     display: grid;
     grid-template-columns: 3ch minmax(0, 1fr);
     column-gap: 1ch;
-    margin-bottom: var(--space-1);
+    padding-block: 0.25rem;
     counter-increment: contents;
   }
 
@@ -70,14 +87,67 @@ const sections = headings.filter((heading) => heading.depth === 2);
   a {
     color: var(--color-muted);
     text-decoration: none;
-    transition: color var(--duration) var(--ease);
   }
 
-  a:hover,
-  a:focus-visible {
+  a:hover {
     color: var(--color-fg);
     text-decoration: underline;
     text-decoration-color: var(--color-accent);
-    text-underline-offset: 0.2em;
+  }
+
+  /* "You are here" in blue: the section on screen. :is() takes a forgiving
+     list, so a browser that does not know :target-current still applies the
+     aria-current half of the rule. */
+  a:is([aria-current='true'], :target-current) {
+    color: var(--color-accent);
+    font-weight: 600;
   }
 </style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('nav.contents');
+  const details = nav?.querySelector('details');
+
+  if (nav && details) {
+    // Open beside the text on a wide screen, closed above it on a narrow one.
+    const wide = matchMedia('(min-width: 64rem)');
+    const fit = () => {
+      details.open = wide.matches;
+    };
+    fit();
+    wide.addEventListener('change', fit);
+
+    // Fallback for browsers without scroll-target-group: mark the last section
+    // whose heading has passed the top third of the viewport.
+    if (!CSS.supports('scroll-target-group', 'auto')) {
+      const links = [...nav.querySelectorAll('a')];
+      const targets = links.map((link) => document.getElementById(link.hash.slice(1)));
+      let queued = false;
+
+      const mark = () => {
+        queued = false;
+        const line = innerHeight / 3;
+        let current = -1;
+        targets.forEach((target, i) => {
+          if (target && target.getBoundingClientRect().top < line) current = i;
+        });
+        links.forEach((link, i) => {
+          if (i === current) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        });
+      };
+
+      addEventListener(
+        'scroll',
+        () => {
+          if (!queued) {
+            queued = true;
+            requestAnimationFrame(mark);
+          }
+        },
+        { passive: true },
+      );
+      mark();
+    }
+  }
+</script>

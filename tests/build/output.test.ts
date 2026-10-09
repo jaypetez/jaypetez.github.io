@@ -303,6 +303,33 @@ describe('essay contents', () => {
   );
 });
 
+describe('page transitions', () => {
+  /** Every view-transition-name set inline on a page, in document order. */
+  const transitionNames = (html: string) =>
+    [...html.matchAll(/view-transition-name:\s*([\w-]+)/g)].map((m) => m[1]!);
+
+  it.each(PAGES)('%s names each transitioning element once', (_label, file) => {
+    // Two elements with the same name abort the whole transition.
+    const names = transitionNames(read(file));
+    expect(names.length, `${file} has a duplicate name: ${names.join(', ')}`).toBe(
+      new Set(names).size,
+    );
+  });
+
+  it.each(POST_SLUGS.map((slug) => [slug] as const))(
+    '%s: the essay title and its row in the writing list share a name, so the title travels',
+    (slug) => {
+      const name = `post-${slug}`;
+      expect(read('writing/index.html')).toMatch(
+        new RegExp(`<h2[^>]*view-transition-name: ${name}"`),
+      );
+      expect(read(`writing/${slug}/index.html`)).toMatch(
+        new RegExp(`<h1[^>]*view-transition-name: ${name}"`),
+      );
+    },
+  );
+});
+
 describe('accessibility (axe-core)', () => {
   it.each(PAGES)(
     '%s has no axe violations',
