@@ -72,6 +72,7 @@
   }
 
   init();
-  // Re-run after client-side navigation so the button keeps working.
-  document.addEventListener('astro:after-swap', init);
+  // A prerendered page ran init() before it was shown; refresh the label on
+  // reveal in case the theme was changed in another page in between.
+  addEventListener('pagereveal', () => apply(read()));
 </script>

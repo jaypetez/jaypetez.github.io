@@ -9,9 +9,15 @@ interface Props {
   description: string;
   /** Set on article pages so the page reports as an article to crawlers. */
   type?: 'website' | 'article';
+  /**
+   * Essays take the wide page, which leaves room for a contents rail on the
+   * left and a margin for notes on the right. The header and footer widen
+   * with it so all three share the same edges.
+   */
+  width?: 'default' | 'wide';
 }
 
-const { title, description, type = 'website' } = Astro.props;
+const { title, description, type = 'website', width = 'default' } = Astro.props;
 
 const SITE_NAME = 'Jayson Petersen';
 // Astro.site comes from `site` in astro.config.mjs, so canonicals are absolute.
@@ -40,28 +46,54 @@ const fullTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
 
     <!--
       Self-hosted; generated fallback metrics prevent layout shift. Only the two
-      faces used above the fold are preloaded. The italic serif is declared but
-      deliberately not preloaded — it is needed on post pages only, and loading
-      it eagerly cost ~50 KB of critical path everywhere else.
+      faces used above the fold are preloaded: the interface sans and the text
+      serif, one variable file each. The mono (code and figures only) and the
+      italic serif (posts only) are declared but load when a page uses them.
     -->
-    <Font cssVariable="--font-serif" preload />
-    <Font cssVariable="--font-mono" preload={[{ weight: 400 }]} />
+    <Font cssVariable="--font-sans" preload={[{ weight: 400, subset: 'latin' }]} />
+    <Font cssVariable="--font-serif" preload={[{ weight: 400, subset: 'latin' }]} />
+    <Font cssVariable="--font-mono" />
     <Font cssVariable="--font-serif-italic" />
 
+    <!--
+      Prerender a same-origin page when the visitor shows intent (hover or
+      pointer-down), so the next page and its title transition are instant.
+      Chromium only; elsewhere it is ignored, and navigation is ordinary.
+    -->
+    <script is:inline type="speculationrules">
+      {
+        "prerender": [
+          {
+            "where": {
+              "and": [{ "href_matches": "/*" }, { "not": { "href_matches": "/rss.xml" } }]
+            },
+            "eagerness": "moderate"
+          }
+        ]
+      }
+    </script>
     <!--
       Applies the stored theme before first paint so a dark-mode visitor never
       sees a white flash. Inline and synchronous by necessity — deferring it is
       what causes the flash.
     -->
     <script is:inline>
-      const stored = localStorage.getItem('theme');
-      if (stored === 'light' || stored === 'dark') {
-        document.documentElement.setAttribute('data-theme', stored);
+      function applyStoredTheme() {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'light' || stored === 'dark') {
+          document.documentElement.setAttribute('data-theme', stored);
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
       }
+      applyStoredTheme();
+      // A prerendered page ran this before it was shown; check again on reveal
+      // in case the theme was changed in between.
+      addEventListener('pagereveal', applyStoredTheme);
     </script>
   </head>
 
-  <body>
+  <body data-width={width === 'wide' ? 'wide' : undefined}>
     <!-- First focusable element on the page, so keyboard users can bypass the nav. -->
     <a class="skip-link" href="#main">
       Skip to content

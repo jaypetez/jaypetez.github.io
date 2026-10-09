@@ -63,38 +63,44 @@ export function contrast(a: string, b: string): number {
 }
 
 /**
- * Reads a token from a specific block of global.css. The light tokens live in
- * `:root {}` and the dark ones in `:root[data-theme='dark'] {}`.
+ * Reads a colour token from the `:root {}` block of global.css. Every colour is
+ * declared once as `light-dark(<light>, <dark>)`, so one declaration yields both
+ * themes; a plain hex value is the same in both.
  */
-function token(name: string, selector: string): string {
-  const block = GLOBAL_CSS.split(selector)[1]?.split('}')[0] ?? '';
-  const match = block.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{3,8})`));
-  if (!match) throw new Error(`Token --${name} not found in ${selector}`);
-  return match[1]!;
+function token(name: string, theme: 'light' | 'dark'): string {
+  const block = GLOBAL_CSS.split(':root {')[1]?.split('}')[0] ?? '';
+  const hex = '(#[0-9a-fA-F]{3,8})';
+  const pair = block.match(
+    new RegExp(`--${name}:\\s*light-dark\\(\\s*${hex}\\s*,\\s*${hex}\\s*\\)`),
+  );
+  if (pair) return theme === 'light' ? pair[1]! : pair[2]!;
+  const single = block.match(new RegExp(`--${name}:\\s*${hex}`));
+  if (!single) throw new Error(`Token --${name} not found in :root`);
+  return single[1]!;
 }
 
-const LIGHT = {
-  bg: token('color-bg', ':root {'),
-  fg: token('color-fg', ':root {'),
-  muted: token('color-muted', ':root {'),
-  accent: token('color-accent', ':root {'),
-};
+const palette = (theme: 'light' | 'dark') => ({
+  bg: token('color-bg', theme),
+  fg: token('color-fg', theme),
+  muted: token('color-muted', theme),
+  accent: token('color-accent', theme),
+  surface: token('color-surface', theme),
+  line: token('color-line', theme),
+});
 
-const DARK = {
-  bg: token('color-bg', ":root[data-theme='dark'] {"),
-  fg: token('color-fg', ":root[data-theme='dark'] {"),
-  muted: token('color-muted', ":root[data-theme='dark'] {"),
-  accent: token('color-accent', ":root[data-theme='dark'] {"),
-};
+const LIGHT = palette('light');
+const DARK = palette('dark');
 
 describe('colour contrast is computed, not eyeballed', () => {
   const pairs = [
     ['light body text', LIGHT.fg, LIGHT.bg],
     ['light muted text', LIGHT.muted, LIGHT.bg],
     ['light accent (links)', LIGHT.accent, LIGHT.bg],
+    ['light accent on the code surface', LIGHT.accent, LIGHT.surface],
     ['dark body text', DARK.fg, DARK.bg],
     ['dark muted text', DARK.muted, DARK.bg],
     ['dark accent (links)', DARK.accent, DARK.bg],
+    ['dark accent on the code surface', DARK.accent, DARK.surface],
   ] as const;
 
   it.each(pairs)('%s clears WCAG AA (4.5:1)', (_label, fg, bg) => {
@@ -109,6 +115,18 @@ describe('colour contrast is computed, not eyeballed', () => {
   it('holds muted text to AAA too — dates, excerpts, and the contents list are read, not glanced at', () => {
     expect(contrast(LIGHT.muted, LIGHT.bg)).toBeGreaterThanOrEqual(7);
     expect(contrast(DARK.muted, DARK.bg)).toBeGreaterThanOrEqual(7);
+  });
+
+  it('holds muted text to AAA on the code surface, where code blocks print their language', () => {
+    expect(contrast(LIGHT.muted, LIGHT.surface)).toBeGreaterThanOrEqual(7);
+    expect(contrast(DARK.muted, DARK.surface)).toBeGreaterThanOrEqual(7);
+  });
+
+  it('draws diagram lines at 3:1 or better, the WCAG floor for meaningful non-text marks', () => {
+    // The stack map's connectors and dashed borders carry meaning, so they use
+    // --color-line rather than the decorative hairline tokens.
+    expect(contrast(LIGHT.line, LIGHT.bg)).toBeGreaterThanOrEqual(3);
+    expect(contrast(DARK.line, DARK.bg)).toBeGreaterThanOrEqual(3);
   });
 });
 
