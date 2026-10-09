@@ -7,8 +7,9 @@ description: Draft and add a blog post to this Astro site. Use when asked to add
 
 A post is **one file**: `src/content/blog/<slug>.md`. Nothing else needs editing. The collection
 glob, the `/writing/` index, the home page's three most recent, `rss.xml.ts`, the sitemap, and the
-built-output test all read `src/content/blog` at build time. There is no tag page and no OG image
-generator to update. If you find yourself editing a second file, stop and check why.
+built-output test all read `src/content/blog` at build time, and so do the topic pages under
+`/writing/topics/`: a new tag gets its page automatically. There is no OG image generator to update.
+If you find yourself editing a second file, stop and check why.
 
 ## 1. Slug
 
@@ -39,7 +40,7 @@ Validated twice: by Zod in `src/content.config.ts` at build time, and by
 | `title` | 1 to 80 characters. Single quotes, or double quotes if it contains an apostrophe. |
 | `description` | **50 to 160 characters.** Count them. This is the most common failure. |
 | `pubDate` | Bare unquoted ISO date. Must parse, and must not be more than 24 hours in the future. |
-| `tags` | Inline array, lowercase, single-quoted, at most 6. |
+| `tags` | Inline array, single-quoted, at most 6. Lowercase words joined by single hyphens (`local-llm`), because each tag is also its topic page's URL; the schema rejects anything else. Reuse an existing tag where one fits — see `/writing/topics/` — so topics gather essays instead of fragmenting. |
 | `draft` | Omit it unless the post is a draft. `draft: true` renders under `npm run dev` but is excluded from the build, the feed, and the sitemap. |
 
 The schema test parses frontmatter with a line-based regex, `^(\w+):\s*(.*)$`, and strips one

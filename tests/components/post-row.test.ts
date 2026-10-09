@@ -53,9 +53,21 @@ describe('PostRow', () => {
     expect(html).not.toMatch(/>AI</);
   });
 
+  it('links each tag to its topic page', async () => {
+    const html = await render({ post });
+    expect(html).toMatch(/<a class="tag" href="\/writing\/topics\/ai\/"/);
+    expect(html).toMatch(/<a class="tag" href="\/writing\/topics\/strategy\/"/);
+  });
+
+  it('names the title for the page transition into the essay, on the heading itself', async () => {
+    expect(await render({ post })).toMatch(
+      /<h2 class="title"[^>]*style="view-transition-name: post-the-moat-is-the-datacenter"/,
+    );
+  });
+
   it('renders no tag list when there are no tags', async () => {
     const html = await render({ post: { ...post, data: { ...post.data, tags: [] } } });
-    expect(html).not.toContain('class="mono tags"');
+    expect(html).not.toContain('class="label tags"');
     expect(html).not.toContain('Tagged');
   });
 });

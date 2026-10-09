@@ -6,37 +6,44 @@
 
 Source for my personal site and blog: **<https://jaypetez.github.io/>**
 
-Built with [Astro](https://astro.build), no client-side framework, and about 1.5 KB of JavaScript on
+Built with [Astro](https://astro.build), no client-side framework, and under 1 KB of JavaScript on
 the wire. Static HTML, self-hosted fonts, and a design system that a test suite keeps honest.
 
 ## Why it looks the way it does
 
-The reference points are plain-text engineering artifacts: RFC figures, `ls -l` column alignment,
-the man page. One rule holds it together — structure (names, labels, dates, navigation) is
-monospace, prose is serif — and one ornament spends the whole decoration budget: the hand-aligned
-ASCII diagram of the stack on the home page, which is also a map of the projects listed under it.
-The palette is a two-colour printer ribbon: ink on paper, with the red band as the single accent;
-links in running text are ink with a red hairline under them, so a paragraph of citations reads as
-text first.
+The design starts from what the site is about rather than from a style. I build agents and the
+infrastructure they run on, so the one bold element is a map of that stack: the home page opens on an
+HTML diagram of four agents, the router they share, and the machines underneath. It is also the
+navigation — every solid box is a project and jumps to its row in the Work list; a dashed box is
+hardware or someone else's software and is not a link. Everything else stays quiet enough for the map
+and the writing to carry the page.
 
-The layout is a ledger, not a grid of cards. Dates sit in a fixed-width gutter so every title starts
-on the same column, and on a wide screen the right margin does work instead of sitting empty: the
-stack figure sits beside the name on the home page, and each essay gets a numbered table of contents
-that sticks beside the text (its numbers and the section numbers come from the same CSS counter, so
-they cannot disagree). On a phone all of it stacks back into one column. None of this needs
-JavaScript.
+Type has three jobs and three faces. [Atkinson Hyperlegible Next](https://github.com/googlefonts/atkinson-hyperlegible-next),
+designed by the Braille Institute for legibility first, sets the interface and headings. Source
+Serif 4 sets anything meant to be read at length, at 18 to 20px in essays. Iosevka appears only where
+the content is literally code or a drawing made of characters. The palette is cool paper and graphite
+ink with one accent, patch-cable blue, which is also the web's own colour for a link: blue means "you
+can go here" or "you are here", and nothing else. Labels are written in sentence case.
 
-The faces are Iosevka (vendored and subset by hand in `src/assets/fonts`, ~16 KB a weight) and
-Source Serif 4. No CSS framework, no icon font, no fake terminal effects — no blinking cursor, no
-typewriter reveal, no scanlines.
+Essays are built to be read rather than scrolled past. The description becomes a standfirst; a
+contents list sits in a rail beside the text on a wide screen (folded above it on a phone) and marks
+the section you are in; a hairline across the top shows how far through you are; a right margin
+holds notes and pull quotes, so a long page has somewhere for the eye to land; and the end of each
+essay links the ones either side and the ones that share its topics. Every tag has a page. The only motion is the essay
+title travelling from the list into the page, a cross-document view transition that needs no
+JavaScript and is off for anyone who has asked for reduced motion.
 
-Generic AI-generated sites converge on the same handful of choices — Inter, a purple-to-blue
-gradient, a grid of identically rounded cards — and `tests/design/tokens.test.ts` fails the build
-if any of them come back. `tests/components/stack-figure.test.ts` does the same for the diagram:
-width ceilings per variant, pure printable ASCII, `role="img"` with a label that says what it
-shows. `tests/build/output.test.ts` checks that every essay's contents list mirrors its `h2`
-sections in order and that every fragment link has a target. Every design value lives in
-`src/styles/global.css` as a token — components never hard-code them.
+Generic AI-generated sites converge on the same choices — Inter, a purple-to-blue gradient, a grid of
+identically rounded cards — and then, once those became recognisable, on a second set: frosted
+headers, tracked capital labels, metadata strung together with middle dots, arrows tacked onto links,
+and a warm-paper, serif, single-red-accent look that this site itself used to wear.
+`tests/design/tokens.test.ts` fails the build if any of them come back, and recomputes every contrast
+ratio from the tokens: AAA for body and muted text, 3:1 for the diagram's lines.
+`tests/components/stack-map.test.ts` refuses a box for a project that is not in the Work list.
+`tests/build/output.test.ts` checks the built pages: every link and fragment resolves, zero axe
+violations, unique view-transition names, each essay's contents list mirrors its sections, and the
+font, stylesheet, and JavaScript budgets hold. Every design value lives in `src/styles/global.css` as
+a token — components never hard-code them.
 
 ## Local development
 
@@ -86,8 +93,10 @@ from the build, the feed, and the sitemap.
 ## Adding a project
 
 The home page list is hand-curated in `src/data/projects.ts` — edit that one file. Tests assert every
-entry has a valid `https://github.com/jaypetez/<name>` URL, a license from the allowed set, and a
-description that reads as a real sentence. Two optional fields put a second link in the row:
+entry has a valid `https://github.com/jaypetez/<name>` URL, a license from the allowed set, a status
+(`active`, `maintained`, `experimental`, or `archived`, set from the repository's real activity),
+and a description that reads as a real sentence. If the project belongs in the stack map, add it to
+`src/data/stack.ts` too. Two optional fields put a second link in the row:
 `docs` for hosted documentation, and `live` for a hosted build of the project itself, which
 renders as `try it`.
 
@@ -99,10 +108,12 @@ Four tiers, all gating deployment:
 - **`tests/components/`** — `.astro` components rendered via Astro's Container API, asserting the
   accessibility contract (`aria-current`, labelled landmarks, hidden decorative glyphs).
 - **`tests/content/`** + **`tests/design/`** — editorial rules the schema can't express, and the
-  anti-slop guard: no gradients, no Inter, no off-token `border-radius`, no hard-coded `z-index`, and
-  contrast ratios recomputed from the tokens rather than eyeballed.
-- **`tests/build/`** — the real `dist/` output: every internal link resolves, zero axe violations,
-  one `h1` per page, skip link before the nav, and a JavaScript budget.
+  anti-slop guard: no gradients, shadows, or frosted glass, no Inter or its successors, no tracked
+  capitals or middle-dot strings, no off-token `border-radius`, no hard-coded `z-index`, and contrast
+  ratios recomputed from the tokens rather than eyeballed.
+- **`tests/build/`** — the real `dist/` output: every internal link and fragment resolves, zero axe
+  violations, one `h1` per page, skip link before the nav, no arrows in link text, unique
+  view-transition names, and the font, stylesheet, and JavaScript budgets.
 
 ## Deployment
 

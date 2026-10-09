@@ -18,14 +18,32 @@ const BLOG_DIR = join(process.cwd(), 'src/content/blog');
  * adding, renaming, or removing a post needs no edit here. Drafts are excluded
  * because the build excludes them.
  */
-const POST_SLUGS: string[] = readdirSync(BLOG_DIR)
+const PUBLISHED_FILES: string[] = readdirSync(BLOG_DIR)
   .filter((file) => /\.mdx?$/.test(file))
-  .filter((file) => !/^draft:\s*true$/m.test(readFileSync(join(BLOG_DIR, file), 'utf8')))
-  .map((file) => file.replace(/\.mdx?$/, ''));
+  .filter((file) => !/^draft:\s*true$/m.test(readFileSync(join(BLOG_DIR, file), 'utf8')));
+
+const POST_SLUGS: string[] = PUBLISHED_FILES.map((file) => file.replace(/\.mdx?$/, ''));
+
+/**
+ * Every topic on a published post, read from the frontmatter the same way, so
+ * a new tag adds its page to every assertion below without an edit here. The
+ * schema requires slug-shaped tags, so a tag is its own URL segment.
+ */
+const TOPICS: string[] = [
+  ...new Set(
+    PUBLISHED_FILES.flatMap((file) => {
+      const line = readFileSync(join(BLOG_DIR, file), 'utf8').match(/^tags:\s*\[(.*)\]\s*$/m);
+      return line
+        ? [...line[1]!.matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]!.toLowerCase())
+        : [];
+    }),
+  ),
+].sort();
 
 const STATIC_PAGES: readonly (readonly [string, string])[] = [
   ['home', 'index.html'],
   ['writing index', 'writing/index.html'],
+  ['topics index', 'writing/topics/index.html'],
   ['about', 'about/index.html'],
   ['404', '404.html'],
 ];
@@ -33,6 +51,7 @@ const STATIC_PAGES: readonly (readonly [string, string])[] = [
 const PAGES: readonly (readonly [string, string])[] = [
   ...STATIC_PAGES,
   ...POST_SLUGS.map((slug) => [`post: ${slug}`, `writing/${slug}/index.html`] as const),
+  ...TOPICS.map((topic) => [`topic: ${topic}`, `writing/topics/${topic}/index.html`] as const),
 ];
 
 beforeAll(() => {
@@ -77,10 +96,12 @@ describe('build output', () => {
     expect(existsSync(join(DIST, 'sitemap-index.xml'))).toBe(true);
   });
 
-  it('found posts to assert against', () => {
-    // Guards the derived-slug approach: an empty content dir would silently
-    // turn several assertions below into no-ops.
+  it('found posts and topics to assert against', () => {
+    // Guards the derived-slug approach: an empty content dir, or a frontmatter
+    // format the tag reader no longer understands, would silently turn several
+    // assertions below into no-ops.
     expect(POST_SLUGS.length).toBeGreaterThan(0);
+    expect(TOPICS.length).toBeGreaterThan(0);
   });
 
   it('lists every published post in the RSS feed with an absolute link', () => {
@@ -93,7 +114,14 @@ describe('build output', () => {
 
   it('lists every page in the sitemap', () => {
     const sitemap = read('sitemap-0.xml');
-    const paths = ['', 'about/', 'writing/', ...POST_SLUGS.map((slug) => `writing/${slug}/`)];
+    const paths = [
+      '',
+      'about/',
+      'writing/',
+      'writing/topics/',
+      ...POST_SLUGS.map((slug) => `writing/${slug}/`),
+      ...TOPICS.map((topic) => `writing/topics/${topic}/`),
+    ];
     for (const path of paths) {
       expect(sitemap).toContain(`https://jaypetez.github.io/${path}`);
     }
@@ -112,9 +140,10 @@ describe('build output', () => {
 
   it.each(PAGES)('%s preloads only the two above-the-fold faces', (_label, file) => {
     const preloads = [...read(file).matchAll(/<link rel="preload"[^>]*href="([^"]+\.woff2)"/g)];
-    // Upright serif for body copy and mono for metadata. The italic serif is
-    // declared but not preloaded — it would add ~50 KB of critical path to every
-    // page for text that only appears inside posts.
+    // The interface sans and the text serif, one variable file each. The mono
+    // (code and figures) and the italic serif (posts only) are declared but not
+    // preloaded — either would add to every page's critical path for text that
+    // most pages do not contain.
     expect(preloads).toHaveLength(2);
   });
 
@@ -127,12 +156,13 @@ describe('build output', () => {
       .map((m) => readFileSync(join(DIST, m[1]!)).byteLength)
       .reduce((a, b) => a + b, 0);
 
-    // Two woff2 faces plus the stylesheet. Fails if a third font gets preloaded.
+    // Two woff2 faces plus the stylesheets: ~85 KB, most of it the serif. Fails
+    // if a third font gets preloaded or the home page's CSS stops being small.
     expect(preloadedFontBytes + css).toBeLessThan(100_000);
   });
 
-  it('ships a trivial amount of JavaScript', () => {
-    const html = read('index.html');
+  it.each(PAGES)('%s ships a trivial amount of JavaScript', (_label, file) => {
+    const html = read(file);
 
     // Astro inlines small scripts, so counting only <script src> would miss the
     // theme toggle entirely and under-report the real payload.
@@ -145,8 +175,9 @@ describe('build output', () => {
       .filter((src) => src.startsWith('/'))
       .reduce((total, src) => total + readFileSync(join(DIST, src)).byteLength, 0);
 
-    // Theme toggle plus Astro's link prefetching — currently ~3.4 KB raw,
-    // ~1.5 KB on the wire. The ceiling exists to catch a framework sneaking in.
+    // The no-flash theme script, the theme toggle, and the speculation rules on
+    // every page (~1.5 KB raw), plus the contents-list script on essays (~2.1 KB
+    // there). The ceiling exists to catch a framework sneaking in.
     expect(inline + external).toBeLessThan(6_000);
     // And prove the measurement is not silently reading zero.
     expect(inline).toBeGreaterThan(0);
@@ -208,6 +239,28 @@ describe('internal links and assets all resolve', () => {
     expect(dead, `dead internal links in ${page}: ${dead.join(', ')}`).toEqual([]);
   });
 
+  it.each(pages.map((p) => [p] as const))(
+    '%s: every fragment link lands on an id on the same page',
+    (page) => {
+      // The crawl above only follows site-relative paths. Fragments matter on
+      // every page now: the stack map's boxes jump to #project-* rows, and an
+      // essay's contents list jumps to its sections.
+      const html = read(page);
+      const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]!));
+      for (const [, fragment] of html.matchAll(/href="#([^"]+)"/g)) {
+        expect(ids.has(fragment!), `#${fragment} has no target in ${page}`).toBe(true);
+      }
+    },
+  );
+
+  it.each(pages.map((p) => [p] as const))('%s tacks no arrows onto its links', (page) => {
+    // "All writing →" is the generated-site default for a link that wants to
+    // look clickable. A link here says where it goes; it does not point.
+    for (const [, text] of read(page).matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)) {
+      expect(text, `arrow in a link on ${page}: ${text}`).not.toMatch(/→|←|↗|&rarr;|&larr;/);
+    }
+  });
+
   it('every page is reachable from the navigation', () => {
     const home = read('index.html');
     for (const route of ['/', '/writing/', '/about/']) {
@@ -257,6 +310,33 @@ describe('essay contents', () => {
       expect(nav, `${file} has ${sections.length} sections but no contents list`).not.toBeNull();
       const links = [...nav![1]!.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]!);
       expect(links).toEqual(sections);
+    },
+  );
+});
+
+describe('page transitions', () => {
+  /** Every view-transition-name set inline on a page, in document order. */
+  const transitionNames = (html: string) =>
+    [...html.matchAll(/view-transition-name:\s*([\w-]+)/g)].map((m) => m[1]!);
+
+  it.each(PAGES)('%s names each transitioning element once', (_label, file) => {
+    // Two elements with the same name abort the whole transition.
+    const names = transitionNames(read(file));
+    expect(names.length, `${file} has a duplicate name: ${names.join(', ')}`).toBe(
+      new Set(names).size,
+    );
+  });
+
+  it.each(POST_SLUGS.map((slug) => [slug] as const))(
+    '%s: the essay title and its row in the writing list share a name, so the title travels',
+    (slug) => {
+      const name = `post-${slug}`;
+      expect(read('writing/index.html')).toMatch(
+        new RegExp(`<h2[^>]*view-transition-name: ${name}"`),
+      );
+      expect(read(`writing/${slug}/index.html`)).toMatch(
+        new RegExp(`<h1[^>]*view-transition-name: ${name}"`),
+      );
     },
   );
 });

@@ -16,8 +16,15 @@ const blog = defineCollection({
     description: z.string().min(50).max(160),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    /** Lowercase, deduplicated at render time. Kept short on purpose. */
-    tags: z.array(z.string().min(1)).max(6).default([]),
+    /**
+     * Each tag is also its topic page's URL (/writing/topics/<tag>/), so it
+     * must already be slug-shaped: lowercase words joined by single hyphens.
+     * Deduplicated at render time. Kept short on purpose.
+     */
+    tags: z
+      .array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'tags must be lowercase-hyphenated'))
+      .max(6)
+      .default([]),
     /** Drafts render locally via `npm run dev` but never reach the build. */
     draft: z.boolean().default(false),
   }),

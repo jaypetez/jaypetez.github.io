@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/prose.css';
 ---
 
 <BaseLayout
   title="About"
   description="About Jayson Petersen — what I work on, how I build, and where to find me."
 >
-  <!-- Prose rhythm (headings, paragraphs, lists, links) comes from .prose in global.css. -->
+  <!-- Prose rhythm (headings, paragraphs, lists, links) comes from .prose in prose.css. -->
   <div class="wrap prose">
     <h1>About</h1>
 
@@ -34,8 +35,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <h2>This site</h2>
     <p>
-      Built with Astro, no client-side framework, and roughly 1.5&nbsp;KB of JavaScript on the wire
-      &mdash; a theme toggle and link prefetching, nothing more. The{' '}
+      Built with Astro, no client-side framework, and under 1&nbsp;KB of JavaScript on the wire
+      &mdash; a theme toggle, and on essays a contents list that keeps your place, nothing more. The{' '}
       <a href="https://github.com/jaypetez/jaypetez.github.io">source is public</a>, including the
       tests that keep the design honest.
     </p>
@@ -49,5 +50,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   h1 {
     margin-bottom: var(--space-3);
+    font-size: var(--text-display);
   }
 </style>

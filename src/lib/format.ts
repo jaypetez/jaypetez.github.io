@@ -62,14 +62,16 @@ const WORDS_PER_MINUTE = 200;
 /**
  * Estimated reading time in whole minutes, never less than 1.
  *
- * Strips fenced code blocks and figures first — nobody reads a config listing
- * or an ASCII diagram at prose speed, and a figure's aria-label is never shown
- * on screen at all. Counting either inflates the estimate on technical posts.
+ * Strips fenced code blocks, figures, and pull quotes first — nobody reads a
+ * config listing or an ASCII diagram at prose speed, a figure's aria-label is
+ * never shown on screen at all, and a pull quote repeats words the reader has
+ * already counted. Counting any of them inflates the estimate.
  */
 export function readingTime(markdown: string): number {
   const prose = markdown
     .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/<figure>[\s\S]*?<\/figure>/g, ' ');
+    .replace(/<figure>[\s\S]*?<\/figure>/g, ' ')
+    .replace(/<aside class="pull"[\s\S]*?<\/aside>/g, ' ');
   const words = prose.split(/\s+/).filter((word) => /[\p{L}\p{N}]/u.test(word));
   return Math.max(1, Math.round(words.length / WORDS_PER_MINUTE));
 }

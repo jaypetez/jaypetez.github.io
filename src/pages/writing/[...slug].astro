@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { publishedPosts } from '../../lib/posts';
+import { neighbours, publishedPosts, related } from '../../lib/posts';
 import { readingTime } from '../../lib/format';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -12,7 +12,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
   );
   return posts.map((post) => ({
     params: { slug: post.id },
-    props: { post },
+    props: {
+      post,
+      ...neighbours(posts, post.id),
+      related: related(posts, post.id),
+    },
   }));
 };
 
@@ -20,9 +24,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // declared explicitly here.
 interface Props {
   post: CollectionEntry<'blog'>;
+  newer: CollectionEntry<'blog'> | undefined;
+  older: CollectionEntry<'blog'> | undefined;
+  related: CollectionEntry<'blog'>[];
 }
 
-const { post } = Astro.props as Props;
+const { post, newer, older, related: relatedPosts } = Astro.props as Props;
 // `headings` is the list Astro extracted while rendering, with the same slugs
 // it wrote into the h2 ids — the table of contents links to those.
 const { Content, headings } = await render(post);
@@ -32,6 +39,7 @@ const minutes = readingTime(post.body ?? '');
 ---
 
 <PostLayout
+  id={post.id}
   title={post.data.title}
   description={post.data.description}
   pubDate={post.data.pubDate}
@@ -39,6 +47,9 @@ const minutes = readingTime(post.body ?? '');
   minutes={minutes}
   tags={post.data.tags}
   headings={headings}
+  older={older}
+  newer={newer}
+  related={relatedPosts}
 >
   <Content />
 </PostLayout>

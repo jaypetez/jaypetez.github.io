@@ -69,6 +69,12 @@ describe('blog content', () => {
     },
   );
 
+  it('names no post "topics", which /writing/topics/ would silently shadow', () => {
+    // A static route beats a dynamic one, so the post would build but never be
+    // reachable — and every link test would still pass.
+    expect(posts.map((post) => post.file.replace(/\.mdx?$/, ''))).not.toContain('topics');
+  });
+
   it.each(posts.map((p) => [p.file, p] as const))(
     '%s starts headings at h2, since the title is the h1',
     (_file, post) => {

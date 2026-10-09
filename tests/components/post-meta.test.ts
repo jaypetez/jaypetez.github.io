@@ -40,6 +40,16 @@ describe('PostMeta', () => {
     expect(html).toContain('testing');
   });
 
+  it('links each tag to its topic page', async () => {
+    const html = await render({ pubDate, tags: ['local-llm'] });
+    expect(html).toMatch(/href="\/writing\/topics\/local-llm\/"/);
+  });
+
+  it('separates the facts with space, not a string of middle dots', async () => {
+    const html = await render({ pubDate, minutes: 4, tags: ['astro', 'testing'] });
+    expect(html).not.toMatch(/&middot;|·/);
+  });
+
   it('renders no tag list when there are no tags', async () => {
     expect(await render({ pubDate, tags: [] })).not.toContain('class="tags"');
   });

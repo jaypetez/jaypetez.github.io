@@ -79,6 +79,13 @@ describe('readingTime', () => {
     expect(readingTime(prose + '\n' + figure)).toBe(1);
   });
 
+  it('discounts pull quotes, which repeat words already in the text', () => {
+    const prose = 'word '.repeat(200);
+    const pull =
+      '<aside class="pull" aria-hidden="true">\n\n' + 'lifted '.repeat(200) + '\n\n</aside>';
+    expect(readingTime(prose + '\n' + pull)).toBe(1);
+  });
+
   it('ignores punctuation-only tokens', () => {
     expect(readingTime('--- *** ... ///')).toBe(1);
   });

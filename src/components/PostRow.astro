@@ -1,13 +1,21 @@
 ---
 import { formatDateShort, toISODate } from '../lib/format';
+import { normalizeTags } from '../lib/posts';
 
 /**
- * One line of the writing ledger, used by the home page and the writing index.
+ * One line of the writing ledger, used by the home page, the writing index,
+ * and the topic pages.
  *
  * The date sits in a fixed-width gutter (the `--gutter-date` token, sized for
- * "31 Jul 2026") so every row's title starts on the same column, the way
- * `ls -l` pads its columns. Below 40rem the gutter has no room and the date
- * moves above the title, still on the same left edge.
+ * "31 Jul 2026") so every row's title starts on the same column. Below 40rem
+ * the gutter has no room and the date moves above the title, still on the
+ * same left edge.
+ *
+ * The heading carries the post's view-transition-name, the same one the
+ * essay's h1 carries, so following the link moves the title into place on the
+ * next page. It is set on the heading rather than the link because a title
+ * that wraps onto two lines is two boxes as a link and one as a block. Each
+ * post appears at most once per list, so the name is unique on the page.
  *
  * The prop is typed structurally rather than as CollectionEntry<'blog'> so the
  * component can be rendered in tests with a plain object.
@@ -22,32 +30,32 @@ interface Props {
       readonly tags?: readonly string[];
     };
   };
-  /** h2 on the writing index, h3 under the home page's Writing label. */
+  /** h2 on the writing index, h3 under the home page's Writing heading. */
   headingLevel?: 'h2' | 'h3';
 }
 
 const { post, headingLevel = 'h2' } = Astro.props;
 const Heading = headingLevel;
-
-// Lowercase and deduplicated at render time, as the content schema promises.
-const tags = [...new Set((post.data.tags ?? []).map((tag) => tag.toLowerCase()))];
+const tags = normalizeTags(post.data.tags);
 ---
 
 <li class="row">
-  <time class="mono date" datetime={toISODate(post.data.pubDate)}>
+  <time class="label date" datetime={toISODate(post.data.pubDate)}>
     {formatDateShort(post.data.pubDate)}
   </time>
 
   <div class="entry">
-    <Heading class="title">
+    <Heading class="title" style={`view-transition-name: post-${post.id}`}>
       <a href={`/writing/${post.id}/`}>{post.data.title}</a>
     </Heading>
-    <p class="excerpt">{post.data.description}</p>
+    <p class="excerpt serif">{post.data.description}</p>
     {tags.length > 0 && (
-      <p class="mono tags">
+      <p class="label tags">
         <span class="visually-hidden">Tagged</span>
         {tags.map((tag) => (
-          <span class="tag">{tag}</span>
+          <a class="tag" href={`/writing/topics/${tag}/`}>
+            {tag}
+          </a>
         ))}
       </p>
     )}
@@ -68,7 +76,6 @@ const tags = [...new Set((post.data.tags ?? []).map((tag) => tag.toLowerCase()))
   .date {
     display: block;
     margin-bottom: var(--space-1);
-    color: var(--color-muted);
   }
 
   /* From 40rem the date takes its gutter and the title starts beside it,
@@ -88,7 +95,8 @@ const tags = [...new Set((post.data.tags ?? []).map((tag) => tag.toLowerCase()))
 
   .title {
     margin-bottom: var(--space-1);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
+    line-height: var(--leading-snug);
   }
 
   .title a {
@@ -106,20 +114,12 @@ const tags = [...new Set((post.data.tags ?? []).map((tag) => tag.toLowerCase()))
     color: var(--color-muted);
   }
 
-  /* Tags are keywords, printed as typed: lowercase, no chip, separated by the
-     same middot the dateline uses. The uppercase of .mono is for labels. */
+  /* Topics are keywords, printed as typed and spaced apart. Each is a link to
+     its topic page. */
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1);
+    gap: var(--space-1) var(--space-2);
     margin-top: var(--space-1);
-    color: var(--color-muted);
-    letter-spacing: 0.04em;
-    text-transform: none;
-  }
-
-  .tag + .tag::before {
-    content: '·' / '';
-    margin-inline-end: var(--space-1);
   }
 </style>

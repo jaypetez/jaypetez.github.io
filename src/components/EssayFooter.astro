@@ -1,0 +1,146 @@
+---
+/**
+ * Where to go after the last paragraph: the essays either side in date order,
+ * then up to three that share the most topics with this one, then the feed.
+ *
+ * Labelled with plain text rather than headings. The essay's h2s are its
+ * sections, and the contents list and the build tests both count on that
+ * being all its h2s are. The related list may be empty — two essays share no
+ * topic with anything not already linked beside them — and then it is left out
+ * rather than padded.
+ *
+ * Typed structurally, like PostRow, so it can be rendered in tests with plain
+ * objects.
+ */
+interface Entry {
+  readonly id: string;
+  readonly data: { readonly title: string };
+}
+
+interface Props {
+  older?: Entry | undefined;
+  newer?: Entry | undefined;
+  related?: readonly Entry[];
+}
+
+const { older, newer, related = [] } = Astro.props;
+const href = (entry: Entry) => `/writing/${entry.id}/`;
+---
+
+<footer class="essay-footer">
+  <nav aria-label="More writing">
+    {(older || newer) && (
+      <div class="neighbours">
+        {older && (
+          <a class="neighbour older" href={href(older)} rel="prev">
+            <span class="label">Older</span>
+            <span class="title">{older.data.title}</span>
+          </a>
+        )}
+        {newer && (
+          <a class="neighbour newer" href={href(newer)} rel="next">
+            <span class="label">Newer</span>
+            <span class="title">{newer.data.title}</span>
+          </a>
+        )}
+      </div>
+    )}
+
+    {related.length > 0 && (
+      <div class="related">
+        <p class="label" id="related-label">
+          Related
+        </p>
+        <ul aria-labelledby="related-label">
+          {related.map((entry) => (
+            <li>
+              <a class="title" href={href(entry)}>
+                {entry.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </nav>
+
+  <p class="label rss">
+    New essays arrive by <a href="/rss.xml">RSS</a>, and <a href="/writing/">all of them</a> are
+    listed by date.
+  </p>
+</footer>
+
+<style>
+  .essay-footer {
+    display: grid;
+    row-gap: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  /* Older on the left and newer on the right, the way the dates run in the
+     ledger; each a block link with its title in the serif. */
+  .neighbours {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 40rem) {
+    .neighbours {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .newer {
+      grid-column: 2;
+      text-align: end;
+    }
+  }
+
+  .neighbour {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: var(--color-fg);
+    text-decoration: none;
+  }
+
+  .neighbour .title {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .neighbour:hover .title {
+    color: var(--color-accent);
+    text-decoration-color: currentcolor;
+  }
+
+  .neighbours + .related {
+    margin-top: var(--space-6);
+  }
+
+  .related ul {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Titles of essays are ink everywhere they are listed, turning blue only
+     under the pointer, so the footer reads like the ledger it points into. */
+  .related a {
+    color: var(--color-fg);
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    text-decoration-color: var(--color-rule);
+  }
+
+  .related a:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentcolor;
+  }
+</style>

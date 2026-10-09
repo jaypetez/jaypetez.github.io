@@ -23,18 +23,14 @@ function isCurrent(href: string): boolean {
 <header class="site-header">
   <div class="page bar">
     <a class="wordmark" href="/">
-      jaypetez
+      Jayson Petersen
     </a>
 
     <nav aria-label="Main">
       <ul>
         {links.map((link) => (
           <li>
-            <a
-              class="mono"
-              href={link.href}
-              aria-current={isCurrent(link.href) ? 'page' : undefined}
-            >
+            <a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
               {link.label}
             </a>
           </li>
@@ -47,39 +43,28 @@ function isCurrent(href: string): boolean {
 </header>
 
 <style>
+  /* Named, so a page transition leaves the header standing still while the
+     content beneath it changes. */
   .site-header {
-    border-bottom: 1px solid var(--color-rule);
+    view-transition-name: site-header;
   }
 
+  /* Name on the left, the toggle on the right, and below 36rem the nav takes
+     a row of its own underneath rather than squeezing the name. */
   .bar {
     display: flex;
-    gap: var(--space-3);
+    flex-wrap: wrap;
+    column-gap: var(--space-3);
     align-items: center;
-    min-height: var(--space-6);
+    padding-block: var(--space-2);
   }
 
-  /* The bar holds 40-odd characters of chrome; below ~416px the gaps give
-     way before the labels do, so nothing ever clips at 320px. */
-  @media (max-width: 26rem) {
-    .bar {
-      gap: var(--space-2);
-    }
-
-    ul {
-      gap: var(--space-1);
-    }
-  }
-
-  /* The username, as typed — lowercase, so it stays out of the .mono utility
-     that uppercases the nav labels around it. */
   .wordmark {
+    margin-inline-end: auto;
     color: var(--color-fg);
-    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas, monospace;
-    /* Body size, not label size: the one piece of chrome that names the site. */
     font-size: var(--text-base);
-    font-weight: 500;
+    font-weight: 700;
     text-decoration: none;
-    transition: color var(--duration) var(--ease);
   }
 
   .wordmark:hover {
@@ -87,7 +72,15 @@ function isCurrent(href: string): boolean {
   }
 
   nav {
-    margin-inline-start: auto;
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  @media (min-width: 36rem) {
+    nav {
+      order: 0;
+      flex-basis: auto;
+    }
   }
 
   ul {
@@ -101,10 +94,10 @@ function isCurrent(href: string): boolean {
   nav a {
     display: inline-block;
     /* 44px tall tap target on touch, without changing the visual rhythm. */
-    padding-block: var(--space-2);
+    padding-block: var(--space-1);
     color: var(--color-muted);
+    font-weight: 500;
     text-decoration: none;
-    transition: color var(--duration) var(--ease);
   }
 
   nav a:hover {
@@ -117,6 +110,6 @@ function isCurrent(href: string): boolean {
     text-decoration: underline;
     text-decoration-color: var(--color-accent);
     text-decoration-thickness: 2px;
-    text-underline-offset: 0.3em;
+    text-underline-offset: 0.4em;
   }
 </style>

@@ -8,10 +8,10 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://jaypetez.github.io',
   integrations: [sitemap()],
-  prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
-  },
+  // No `prefetch`: BaseLayout ships a static speculation-rules block instead,
+  // which prerenders same-origin pages in Chromium for ~200 bytes of JSON
+  // rather than Astro's ~2.5 KB prefetch runtime. Safari and Firefox lose
+  // prefetching; for pages this small, that costs very little.
   build: {
     // Emit `about/index.html` rather than `about.html` so URLs work with or
     // without a trailing slash on GitHub Pages' static file server.
@@ -23,11 +23,40 @@ export default defineConfig({
   // Astro generate fallback metrics that prevent layout shift.
   fonts: [
     {
+      // The interface face: navigation, headings, labels, the stack map.
+      // Designed by the Braille Institute for legibility first, which is the
+      // same priority the AAA contrast rule sets for the palette.
+      //
+      // Vendored rather than fetched: Google's Latin file is variable from 200
+      // to 800 (34 KB), and the site only sets 400 to 700. Clamping the weight
+      // axis to that range with fontTools' instancer cuts it to 21 KB, which
+      // comes straight off every page's critical path. Regenerate from the
+      // upstream Latin file with:
+      //   fonttools varLib.instancer <in>.woff2 wght=400:700 --flavor=woff2
+      // OFL, licence alongside; the family reserves no font name.
+      provider: fontProviders.local(),
+      name: 'Atkinson Hyperlegible Next',
+      cssVariable: '--font-sans',
+      fallbacks: ['sans-serif'],
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/atkinson-hyperlegible-next-latin-wght400-700.woff2'],
+            weight: '400 700',
+            style: 'normal',
+          },
+        ],
+      },
+    },
+    {
       provider: fontProviders.google(),
       name: 'Source Serif 4',
       cssVariable: '--font-serif',
-      // Only the weights the stylesheet actually uses: 400 body, 600 headings.
-      weights: [400, 600],
+      // A range rather than a list: the file Google serves is variable in
+      // weight either way (~51 KB), so naming the range costs nothing and
+      // makes every weight between them available. Never request the optical
+      // size axis — that file is 122 KB and breaks the critical-path budget.
+      weights: ['400 600'],
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
@@ -65,6 +94,10 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark' },
+      // Both palettes as custom properties, neither as a default colour, so
+      // global.css can choose between them with light-dark() — the same logic
+      // as every other colour on the site, print included.
+      defaultColor: false,
       wrap: true,
     },
   },

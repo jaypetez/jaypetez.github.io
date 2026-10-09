@@ -2,12 +2,24 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostRow from '../../components/PostRow.astro';
-import { publishedPosts } from '../../lib/posts';
+import { publishedPosts, topicsWithCounts } from '../../lib/posts';
 
 const posts = publishedPosts<CollectionEntry<'blog'>>(
   await getCollection('blog'),
   import.meta.env.DEV,
 );
+
+// The topics worth a shortcut from here are the ones that gather more than
+// one essay; the rest are a click away on the topics page.
+const topics = topicsWithCounts(posts);
+const shared = topics.filter((topic) => topic.count > 1);
+
+// Year headings only once there is more than one year to tell apart.
+const years = [...new Set(posts.map((post) => post.data.pubDate.getUTCFullYear()))];
+const byYear = years.map((year) => ({
+  year,
+  posts: posts.filter((post) => post.data.pubDate.getUTCFullYear() === year),
+}));
 ---
 
 <BaseLayout
@@ -16,13 +28,37 @@ const posts = publishedPosts<CollectionEntry<'blog'>>(
 >
   <div class="head">
     <h1>Writing</h1>
-    <p class="lede">
+    <p class="lede serif">
       Notes on agents, self-hosted inference, and decisions I had to think about twice.
     </p>
+    {topics.length > 0 && (
+      <p class="label topics">
+        <span>Topics</span>
+        {shared.map((topic) => (
+          <a href={`/writing/topics/${topic.name}/`}>
+            {topic.name} <span class="count">{topic.count}</span>
+          </a>
+        ))}
+        <a href="/writing/topics/">All {topics.length} topics</a>
+      </p>
+    )}
   </div>
 
   {posts.length === 0 ? (
     <p class="empty">No posts yet.</p>
+  ) : years.length > 1 ? (
+    byYear.map(({ year, posts: inYear }) => (
+      <section aria-labelledby={`year-${year}`}>
+        <h2 class="year" id={`year-${year}`}>
+          {year}
+        </h2>
+        <ul class="posts">
+          {inYear.map((post) => (
+            <PostRow post={post} headingLevel="h3" />
+          ))}
+        </ul>
+      </section>
+    ))
   ) : (
     <ul class="posts">
       {posts.map((post) => (
@@ -37,10 +73,34 @@ const posts = publishedPosts<CollectionEntry<'blog'>>(
     padding-block: var(--space-8) var(--space-4);
   }
 
+  h1 {
+    font-size: var(--text-display);
+  }
+
   .lede {
     max-width: var(--measure);
     margin-top: var(--space-2);
     color: var(--color-muted);
+    font-size: var(--text-xl);
+  }
+
+  /* The busiest topics, as a line of shortcuts: name and count, spaced. */
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    align-items: baseline;
+    margin-top: var(--space-4);
+  }
+
+  .count {
+    color: var(--color-muted);
+  }
+
+  .year {
+    margin-block: var(--space-6) var(--space-2);
+    color: var(--color-muted);
+    font-size: var(--text-lg);
   }
 
   .posts {
