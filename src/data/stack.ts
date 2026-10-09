@@ -4,8 +4,9 @@
  * Kept apart from projects.ts because it describes relationships, not
  * projects. Every `project` here must name an entry in projects.ts
  * (tests/components/stack-map.test.ts holds that), so the map can never point
- * at something the Work list does not have. gbrain-copilot is deliberately
- * absent: it runs inside the Copilot CLI, not through agent-gpu.
+ * at something the Work list does not have. gbrain-copilot and famlobster are
+ * deliberately absent: the first runs inside the Copilot CLI and the second
+ * calls Anthropic's API directly, so neither goes through agent-gpu.
  */
 
 /** A box that is one of my projects, and links to its row in the Work list. */
