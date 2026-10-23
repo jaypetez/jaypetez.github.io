@@ -115,7 +115,7 @@ Prefer ASCII. The first chart on the site is in `jev-is-a-classifier-with-a-grea
 
 ## 6. Verify
 
-Node 22.12 or newer is required. Run the same sequence CI runs, in the same order:
+Node 22.23.4 or newer is required. Run the same sequence CI runs, in the same order:
 
 ```
 npm run format     # posts are gitignored by Prettier, but the rest of the tree is not
