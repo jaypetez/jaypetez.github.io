@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Search from '../components/Search.astro';
+---
+
+<BaseLayout
+  title="Search"
+  description="Search Jayson Petersen's essays, projects, and About page by word or phrase."
+>
+  <div class="wrap">
+    <h1>Search</h1>
+    <p class="lede serif">
+      Every essay, the About page, and the projects in the Work list. Ctrl+K (or Cmd+K) opens this
+      from any page.
+    </p>
+    <Search mode="page" />
+    <noscript>
+      <p class="serif">
+        Search runs in the browser, so it needs JavaScript. Without it,{' '}
+        <a href="/writing/">the writing</a> lists every essay by date and{' '}
+        <a href="/writing/topics/">topics</a> groups them.
+      </p>
+    </noscript>
+  </div>
+</BaseLayout>
+
+<style>
+  .wrap {
+    max-width: 44rem;
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+  }
+
+  .lede {
+    margin-block: var(--space-2) var(--space-4);
+    color: var(--color-muted);
+    font-size: var(--text-lg);
+  }
+</style>

@@ -7,7 +7,8 @@ import sitemap from '@astrojs/sitemap';
 // link would have to be prefixed with it.
 export default defineConfig({
   site: 'https://jaypetez.github.io',
-  integrations: [sitemap()],
+  // /search/ is a tool, not a page anyone should land on from a search engine.
+  integrations: [sitemap({ filter: (page) => !page.endsWith('/search/') })],
   // No `prefetch`: BaseLayout ships a static speculation-rules block instead,
   // which prerenders same-origin pages in Chromium for ~200 bytes of JSON
   // rather than Astro's ~2.5 KB prefetch runtime. Safari and Firefox lose
@@ -91,6 +92,17 @@ export default defineConfig({
       },
     },
   ],
+  vite: {
+    build: {
+      rollupOptions: {
+        // The search index is written by `pagefind` after astro build, so it
+        // cannot be bundled; search imports it at run time from the built
+        // site. Marked external, the import stays as written, and Astro sees
+        // it and serves the search script as its own file rather than inline.
+        external: ['/pagefind/pagefind.js'],
+      },
+    },
+  },
   markdown: {
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark' },

@@ -65,7 +65,11 @@ const fullTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
         "prerender": [
           {
             "where": {
-              "and": [{ "href_matches": "/*" }, { "not": { "href_matches": "/rss.xml" } }]
+              "and": [
+                { "href_matches": "/*" },
+                { "not": { "href_matches": "/rss.xml" } },
+                { "not": { "href_matches": "/search/" } }
+              ]
             },
             "eagerness": "moderate"
           }
