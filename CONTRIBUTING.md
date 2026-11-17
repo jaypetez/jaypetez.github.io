@@ -51,7 +51,7 @@ those tokens; they never define their own.
 
 ## Getting set up
 
-Requires Node 22.12 or newer.
+Requires Node 22.23.4 or newer.
 
 ```bash
 npm install

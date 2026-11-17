@@ -9,6 +9,7 @@ describe('projects data', () => {
       'ollama-mobile',
       'stride',
       'sidekick',
+      'famlobster',
       'agent-gpu',
       'gbrain-copilot',
     ]);

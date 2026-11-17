@@ -4,18 +4,23 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * ASCII figures embedded in posts, held to the same craft rules as the one on
- * the home page (tests/components/stack-figure.test.ts). Art is the easiest
+ * the home page (tests/components/stack-map.test.ts). Art is the easiest
  * thing on a page to break invisibly: one column past the ceiling and a 320px
  * viewport scrolls sideways, one character outside the vendored Iosevka subset
  * and the alignment depends on a glyph the webfont never shipped.
  *
  * Posts are plain markdown with no MDX, so figures are raw HTML and nothing in
  * the build would object to art that renders as a smear.
+ *
+ * A chart that can't be drawn in characters is inline SVG instead, and it has
+ * its own failure modes: a hard-coded colour ignores the theme and the print
+ * sheet, and a blank line ends the markdown HTML block, so the rest of the
+ * drawing renders as stray text.
  */
 
 const BLOG_DIR = join(process.cwd(), 'src/content/blog');
 
-/** The widest figure the CSS clamp in PostLayout.astro is sized for. */
+/** The widest figure the CSS clamp in src/styles/prose.css is sized for. */
 const MAX_COLUMNS = 44;
 
 interface Figure {
@@ -41,6 +46,36 @@ const figures = readdirSync(BLOG_DIR)
   .flatMap(figuresIn);
 
 const cases = figures.map((f) => [`${f.file} fig ${f.index}`, f] as const);
+
+interface Chart {
+  file: string;
+  index: number;
+  label: string;
+  attributes: string;
+  body: string;
+  /** The whole <figure> the chart sits in, or '' if it sits in none. */
+  figure: string;
+}
+
+function chartsIn(file: string): Chart[] {
+  const raw = readFileSync(join(BLOG_DIR, file), 'utf8');
+  const figureBlocks = [...raw.matchAll(/<figure>[\s\S]*?<\/figure>/g)].map((m) => m[0]);
+  const pattern = /<svg role="img" aria-label="([^"]*)"([^>]*)>([\s\S]*?)<\/svg>/g;
+  return [...raw.matchAll(pattern)].map((match, index) => ({
+    file,
+    index: index + 1,
+    label: match[1]!,
+    attributes: match[2]!,
+    body: match[3]!,
+    figure: figureBlocks.find((block) => block.includes(match[0])) ?? '',
+  }));
+}
+
+const charts = readdirSync(BLOG_DIR)
+  .filter((f) => /\.mdx?$/.test(f))
+  .flatMap(chartsIn);
+
+const chartCases = charts.map((c) => [`${c.file} chart ${c.index}`, c] as const);
 
 describe('post figures', () => {
   it.each(cases)('%s stays inside the column ceiling', (_name, figure) => {
@@ -76,6 +111,35 @@ describe('post figures', () => {
   });
 });
 
+// Vitest fails a suite with no tests in it, so the chart rules only register
+// once a post actually carries a chart.
+describe.runIf(chartCases.length > 0)('post charts', () => {
+  it.each(chartCases)('%s carries a label that says what the chart shows', (_name, chart) => {
+    expect(chart.label.length).toBeGreaterThan(40);
+  });
+
+  it.each(chartCases)('%s scales from a viewBox', (_name, chart) => {
+    expect(chart.attributes).toMatch(/\sviewBox="[^"]+"/);
+  });
+
+  it.each(chartCases)('%s takes every colour from the theme', (_name, chart) => {
+    const svg = chart.attributes + chart.body;
+    // Colours come from classes in src/styles/prose.css, which read the
+    // light-dark() tokens and the print sheet. Only none and currentColor
+    // may appear as a presentation attribute.
+    expect(svg, 'inline style attribute').not.toMatch(/\sstyle="/);
+    expect(svg, 'hard-coded fill or stroke').not.toMatch(
+      /\s(?:fill|stroke)="(?!none"|currentColor")[^"]*"/,
+    );
+    expect(svg, 'colour literal').not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i);
+  });
+
+  it.each(chartCases)('%s sits in a figure with no blank line to end it early', (_name, chart) => {
+    expect(chart.figure, 'chart outside a <figure>').not.toBe('');
+    expect(chart.figure, 'blank line inside the figure').not.toMatch(/\n[ \t]*\r?\n/);
+  });
+});
+
 describe('post figure markup', () => {
   const files = readdirSync(BLOG_DIR).filter((f) => /\.mdx?$/.test(f));
 
@@ -83,7 +147,8 @@ describe('post figure markup', () => {
     const raw = readFileSync(join(BLOG_DIR, file), 'utf8');
     const opens = raw.match(/<figure>/g)?.length ?? 0;
     const captions = raw.match(/<figcaption>/g)?.length ?? 0;
-    const drawings = raw.match(/<pre role="img"/g)?.length ?? 0;
+    const drawings =
+      (raw.match(/<pre role="img"/g)?.length ?? 0) + (raw.match(/<svg role="img"/g)?.length ?? 0);
     const bare = raw.match(/<pre(?! role="img")/g)?.length ?? 0;
 
     expect(captions, 'every figure needs a caption').toBe(opens);

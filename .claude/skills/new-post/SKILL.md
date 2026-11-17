@@ -88,7 +88,7 @@ Figures are raw HTML in the markdown, and `tests/content/post-figures.test.ts` i
 </figure>
 ```
 
-- Every art line is **at most 44 columns**. This matches the `clamp()` in `PostLayout.astro`.
+- Every art line is **at most 44 columns**. This matches the `clamp()` in `src/styles/prose.css`.
 - Printable ASCII only, character codes 32 to 126. The vendored Iosevka subset has nothing else.
 - **No `<` or `>` anywhere in the art.** Markdown reads them as HTML. Use `v`, `^`, `+`, `|`, `-`.
 - The `aria-label` must be longer than 40 characters and describe the diagram, not name it.
@@ -131,9 +131,25 @@ the second card<span class="note">a used 3090 is still the cheapest 24 GB</span>
 
 Never two notes in the same or adjacent paragraphs; they stack in the margin and collide.
 
+A chart that genuinely can't be drawn in characters (a scatter on a log scale, say) can be inline
+SVG in place of the `<pre>`: `<svg role="img" aria-label="..." viewBox="...">` inside the same
+`<figure>` with a `<figcaption>`. Generate the coordinates with a script rather than by hand. The
+same test holds it to its own rules:
+
+- The `aria-label` is over 40 characters and there is a `viewBox`.
+- **No colours in the SVG.** No `style=`, no hex or `rgb()`, and `fill`/`stroke` attributes only as
+  `none` or `currentColor`. Marks take their colour from the `chart-*` classes in
+  `src/styles/prose.css` (`chart-rule`, `chart-grid`, `chart-mark`, `chart-key` for the one point
+  the story is about, `chart-name`, `chart-hit`), so the chart follows the theme and the print sheet.
+- **No blank line anywhere inside the `<figure>`.** A blank line ends the markdown HTML block and
+  the rest of the SVG renders as text.
+- Keep the viewBox near 340 wide with 13-unit text, so labels stay legible at 320px.
+
+Prefer ASCII. The first chart on the site is in `jev-is-a-classifier-with-a-great-api.md`.
+
 ## 6. Verify
 
-Node 22.12 or newer is required. Run the same sequence CI runs, in the same order:
+Node 22.23.4 or newer is required. Run the same sequence CI runs, in the same order:
 
 ```
 npm run format     # posts are gitignored by Prettier, but the rest of the tree is not
