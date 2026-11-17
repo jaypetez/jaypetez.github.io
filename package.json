@@ -30,10 +30,10 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.4.1"
+    "astro": "^7.4.8"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
+    "@astrojs/check": "^0.9.12",
     "@vitest/coverage-v8": "^5.0.4",
     "axe-core": "^4.14.0",
     "happy-dom": "^21.0.1",
