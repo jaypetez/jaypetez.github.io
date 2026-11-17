@@ -12,7 +12,8 @@ your instinct, the posts win; go read one.
   about the prose here, and it is also the cheapest AI tell to remove.
 - Contractions throughout. "doesn't", "won't", "I've".
 - No emoji. No bold-led bullet lists. Recent posts contain no code fences at all.
-- HTML entities in figure captions (`&middot;`, `&mdash;`), not literal Unicode.
+- HTML entities in figure captions (`&mdash;`, `&rsquo;`), not literal Unicode. Captions carry no
+  number and no middle dot; the layout numbers figures.
 - American-or-British spelling is not policed, but be consistent within a post.
 
 ## Length and shape

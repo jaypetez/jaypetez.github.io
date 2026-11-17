@@ -21,8 +21,8 @@ on cyber tasks, narrower than a year ago. On [Artificial Analysis's
 intelligence-per-dollar
 chart](https://artificialanalysis.ai/articles/recent-open-weights-model-launches),
 nine of the thirteen models on the Pareto frontier are open weights, priced at
-a fifth to a thirtieth of the frontier APIs. The leaked 2023 Google memo ("we
-have no moat, and neither does OpenAI") called all of this three years early.
+a fifth to a thirtieth of the frontier APIs. The leaked 2023 Google memo<span class="note">"we
+have no moat, and neither does OpenAI"</span> called all of this three years early.
 
 And yet Anthropic ended July at a $65B revenue run rate, OpenAI is above
 $40B, and both are heading toward IPOs. Commodities don't produce numbers
@@ -50,6 +50,12 @@ in a blog post, did the vendor publish a safety framework before shipping,
 and who do we sue when it goes wrong. A model that scores three points lower
 on some index but clears those questions wins far more often than the
 leaderboard says it should.
+
+<aside class="pull" aria-hidden="true">
+
+The cloud already won the trust argument. The model rides along.
+
+</aside>
 
 This is also where the labs quietly lose control of their own distribution,
 because the entity that clears those questions is usually not the lab. Claude
@@ -97,9 +103,9 @@ I'm not writing the labs' obituary; a $65B run rate is not what dying looks
 like. They hold three real assets, and they're worth taking one at a time.
 
 Pre-bought compute is the first. Training demand exceeds what the grid can
-add by an order of magnitude, so whoever locked in gigawatts early (OpenAI's
+add by an order of magnitude, so whoever locked in gigawatts early<span class="note">OpenAI's
 $250B Azure commitment plus Oracle and CoreWeave, Anthropic spread across
-Trainium, TPUs, and Azure) owns something physical and genuinely scarce. But
+Trainium, TPUs, and Azure</span> owns something physical and genuinely scarce. But
 notice whose datacenters those are. The moat is leased.
 
 Workflows are the second. Claude Code reportedly holds about half the

@@ -84,7 +84,7 @@ verbatim quote from you supporting it.
           v                     v
      up one level         nothing moves
 </pre>
-<figcaption>fig 1 &middot; the only claim the interview trusts</figcaption>
+<figcaption>The only claim the interview trusts</figcaption>
 </figure>
 
 Around that sits a ratchet. Coverage never falls, it rises at most one level
@@ -128,6 +128,13 @@ host the page's CSP will talk to. That is a weaker guarantee than [running
 the model yourself](/writing/run-your-own-model/) and I'd rather say so than
 dress it up. There are no dependencies, so there's no build step and nothing
 in the supply chain to trust.
+
+<aside class="pull" aria-hidden="true">
+
+The chat is a good place to find out what the work is and the worst place to
+do it.
+
+</aside>
 
 What I'm least sure about is durability. Models are getting better at asking
 unprompted, and a frontier model told to interview you does a respectable job

@@ -123,6 +123,13 @@ its own work and self-correct; an agent with none of those just generates
 confidently into the void, and self-critique without ground truth amplifies
 confidence rather than correctness.
 
+<aside class="pull" aria-hidden="true">
+
+The model matters. The stuff around it matters comparably, and it's the part
+you actually control.
+
+</aside>
+
 Evals are the other half, and they're the thing teams skip most reliably.
 Public benchmarks won't save you: the ["SWE-Bench
 Illusion"](https://arxiv.org/abs/2506.12286) paper found models locating
@@ -139,8 +146,8 @@ point from the other direction. The biggest verified agentic win on record
 is still [Amazon Q migrating tens of thousands of internal Java
 apps](https://press.aboutamazon.com/2024/12/new-amazon-q-developer-capabilities-accelerate-large-scale-transformations-of-legacy-workloads),
 which Amazon values at 4,500 developer-years and $260M a year. Look at what
-it actually was: one narrow, verifiable task, drowning in ground truth
-(does it compile, do the tests pass), with humans approving the output. The
+it actually was: one narrow, verifiable task, drowning in ground truth<span class="note">does it compile, do the tests pass</span>,
+with humans approving the output. The
 least glamorous autonomous system imaginable, and the most valuable.
 
 ## The token bill arrives either way

@@ -54,7 +54,7 @@ reference](https://docs.typesafe.ai/api.md).
    team       billing 0.8, auth 0.1, ...
    severity   3.4, between levels 3 and 4
 </pre>
-<figcaption>fig 1 &middot; the docs example, with two more questions</figcaption>
+<figcaption>The docs example, with two more questions</figcaption>
 </figure>
 
 The [models page](https://docs.typesafe.ai/models.md) fills in the rest.
@@ -198,7 +198,7 @@ a tenth of a point, it's 76 times cheaper and 25 times faster.
   </g>
   <text class="chart-name" x="80.9" y="117.3" text-anchor="end">Jev</text>
 </svg>
-<figcaption>fig 2 &middot; TypeSafe's own numbers, workflow runs only</figcaption>
+<figcaption>TypeSafe's own numbers, workflow runs only</figcaption>
 </figure>
 
 Seventy-six times cheaper at the same score is still a very good number.
@@ -245,7 +245,7 @@ problem a little bit to the user."
   counted as hallucination     no
   correct                      no
 </pre>
-<figcaption>fig 3 &middot; what a 0% hallucination rate measures</figcaption>
+<figcaption>What a 0% hallucination rate measures</figcaption>
 </figure>
 
 Constrained output isn't new either. OpenAI shipped [Structured
@@ -351,7 +351,7 @@ them in one call, with a logistic regression on top.
    haiku 4.5, five questions  93.2%
    regex, two features        91.8%
 </pre>
-<figcaption>fig 4 &middot; the same model, asked better questions</figcaption>
+<figcaption>The same model, asked better questions</figcaption>
 </figure>
 
 Those are scores on the held-out half. The gap to Haiku wasn't significant

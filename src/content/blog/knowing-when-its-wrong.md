@@ -172,6 +172,13 @@ to trust anything an agent
 produces](/writing/nobody-has-solved-prompt-injection/): the unglamorous
 verification layer is where the value moved.
 
+<aside class="pull" aria-hidden="true">
+
+A pull request you rejected with a good reason says more than a repository
+you wrote alone.
+
+</aside>
+
 And aim at the roles that grew. SignalFire has forward-deployed engineering
 up 30% since 2022 and AI/ML engineering up 39%, while front-end roles fell
 25%. The jobs that survived are the ones where you sit between a customer and

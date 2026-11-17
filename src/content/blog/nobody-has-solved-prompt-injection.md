@@ -86,6 +86,13 @@ system prompt, the user's request, and whatever text came back from a tool
 as one undifferentiated stream of tokens. Instructions and data share a
 channel. Everything else is consequences.
 
+<aside class="pull" aria-hidden="true">
+
+A probabilistic filter in front of a deterministic vulnerability is a speed
+bump with a marketing budget.
+
+</aside>
+
 The industry's favorite response is a classifier in front of the model, and
 the numbers those products advertise are the tell. Willison's [line about
 guardrail vendors](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)
